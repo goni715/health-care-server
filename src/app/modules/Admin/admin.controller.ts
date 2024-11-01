@@ -1,31 +1,17 @@
 import { Request, Response } from "express";
 import { getAllAdminsService } from "./admin.service";
+import { AdminValidFields } from "./admin.constant";
+import pickValidFields from "../../utils/pickValidFields";
 
 
-const pick = (obj: Record<string, unknown>, keys: string[]) => {
-  let validFieldsObject: Record<string, unknown> = {}
-  const objKeysArray = Object.keys(obj);
 
-  if(objKeysArray.length > 0){
-    objKeysArray.forEach((key)=> {
-      if(keys.includes(key)){
-        validFieldsObject[key] = obj[key]
-      }
-    })
-  }
-
-  console.log(validFieldsObject);
-  
-
-}
 
 
 const getAllAdmins = async (req: Request, res: Response) => {
-  pick(req.query, ['searchTerm', 'name', 'email', 'contactNumber'])
-
 
     try{
-      const result =  await getAllAdminsService(req.query);
+      const validatedQuery = pickValidFields(req.query, AdminValidFields);
+      const result =  await getAllAdminsService(validatedQuery);
       res.status(200).json({
         success: true,
         message: "Admins are retrieved successfully",

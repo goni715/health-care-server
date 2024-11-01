@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client"
+import { AdminSearchableFields } from "./admin.constant";
 
 const prisma = new PrismaClient();
 
@@ -6,8 +7,7 @@ const getAllAdminsService = async (query:any) => {
     const { searchTerm, ...filterData } = query;
     const andConditions: Prisma.AdminWhereInput[] = [];
     //let conditions = {};
-    const serachFields = ['name', 'email', 'contactNumber'];
-    const searchQuery = serachFields.map((item)=>({
+    const searchQuery = AdminSearchableFields.map((item)=>({
         [item]: {
             contains: query?.searchTerm,
             mode: 'insensitive'
