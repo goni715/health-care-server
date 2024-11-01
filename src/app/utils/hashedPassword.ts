@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import config from '../config';
 
 
 const hashedPassword = async (password: string) => {

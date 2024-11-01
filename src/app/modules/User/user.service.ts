@@ -1,4 +1,5 @@
 import { PrismaClient, UserRole } from "@prisma/client";
+import hashedPassword from "../../utils/hashedPassword";
 
 const prisma = new PrismaClient()
 
@@ -7,7 +8,7 @@ const creatAdminService = async ( payload:any ) => {
 
     const userData = {
         email: payload.adminData.email,
-        password: payload.password,
+        password: await hashedPassword(payload.password),
         role: UserRole.admin
     }
 
