@@ -1,12 +1,12 @@
-import express, { Request, Response } from "express";
+import { Server } from "http";
+import app from "./app";
 
-const app = express();
+const port = 5000;
 
-//testing route
-app.get("/", (req: Request, res: Response) => {
-  res.send("This is PH Health Care server");
-});
+async function main() {
+  const server: Server = app.listen(port, () => {
+    console.log(`server running at ${port} port`);
+  });
+}
 
-app.listen(5000, () => {
-  console.log(`server running at @5000`);
-});
+main();
