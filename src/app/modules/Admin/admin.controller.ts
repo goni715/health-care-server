@@ -6,12 +6,12 @@ import pickValidFields from "../../utils/pickValidFields";
 
 
 
-
 const getAllAdmins = async (req: Request, res: Response) => {
 
     try{
       const validatedQuery = pickValidFields(req.query, AdminValidFields);
-      const result =  await getAllAdminsService(validatedQuery);
+      console.log(validatedQuery);
+      const result = await getAllAdminsService(validatedQuery);
       res.status(200).json({
         success: true,
         message: "Admins are retrieved successfully",

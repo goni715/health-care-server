@@ -10,7 +10,7 @@ const pickValidFields = (queryObj: Record<string, unknown>, keys: string[]) => {
     });
   }
 
-  return pickValidFields;
+  return validFieldsObject;
 };
 
 export default pickValidFields;
