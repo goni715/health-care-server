@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import bodyParser from "body-parser";
 import router from "./app/routes";
+import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 
 const app: Application = express();
 
@@ -22,7 +23,11 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 //application routes
-app.use('/api/v1', router)
+app.use('/api/v1', router);
+
+
+//global error handler middleware
+app.use(globalErrorHandler)
 
 
 export default app;
