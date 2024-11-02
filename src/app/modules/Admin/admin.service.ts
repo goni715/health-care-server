@@ -4,7 +4,7 @@ import { AdminSearchableFields } from "./admin.constant";
 const prisma = new PrismaClient();
 
 const getAllAdminsService = async (query:any) => {
-    const { searchTerm, page, limit, ...filterData } = query;
+    const { searchTerm, page, limit, sortBy, sortOrder, ...filterData } = query;
     const andConditions: Prisma.AdminWhereInput[] = [];
     //let conditions = {};
     const searchQuery = AdminSearchableFields.map((item)=>({
@@ -103,7 +103,12 @@ const getAllAdminsService = async (query:any) => {
     const result = await prisma.admin.findMany({
         where: whereConditions,
         skip: Number(page-1) * limit || 0,
-        take: Number(limit) || 10
+        take: Number(limit) || 10,
+        orderBy: sortBy && sortOrder ? {
+            [sortBy]: sortOrder
+        } : {
+            createdAt: 'desc'
+        }
     });
     return result;
 }

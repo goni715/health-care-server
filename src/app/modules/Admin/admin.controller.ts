@@ -10,7 +10,6 @@ const getAllAdmins = async (req: Request, res: Response) => {
 
     try{
       const validatedQuery = pickValidFields(req.query, AdminValidFields);
-      console.log(validatedQuery);
       const result = await getAllAdminsService(validatedQuery);
       res.status(200).json({
         success: true,
