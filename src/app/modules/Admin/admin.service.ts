@@ -123,7 +123,20 @@ const getAllAdminsService = async (query:any) => {
             [pagination.sortBy]: pagination.sortOrder
         }
     });
-    return result;
+
+    const total = await prisma.admin.count({
+        where: whereConditions
+    })
+
+
+    return {
+        meta: {
+            page: pagination.page,
+            limit: pagination.limit,
+            total
+        },
+        data: result
+    };
 }
 
 
