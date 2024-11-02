@@ -140,6 +140,18 @@ const getAllAdminsService = async (query:any) => {
 }
 
 
+const getSingleAdminService = async (id: string) => {
+    const result = await prisma.admin.findUnique({
+        where: {
+            id
+        }
+    })
+
+    return result;
+}
+
+
 export {
-    getAllAdminsService
+    getAllAdminsService,
+    getSingleAdminService
 }

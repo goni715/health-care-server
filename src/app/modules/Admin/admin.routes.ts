@@ -5,6 +5,7 @@ import { adminController } from './admin.controller';
 const router = express.Router();
 
 router.get('/get-all-admins', adminController.getAllAdmins);
+router.get('/get-single-admin/:id', adminController.getSingleAdmin);
 
 
 
