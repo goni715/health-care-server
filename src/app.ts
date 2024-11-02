@@ -4,6 +4,7 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import router from "./app/routes";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
+import notFound from "./app/middlewares/notFound";
 
 const app: Application = express();
 
@@ -28,6 +29,7 @@ app.use('/api/v1', router);
 
 //global error handler middleware
 app.use(globalErrorHandler)
+app.use(notFound)
 
 
 export default app;
