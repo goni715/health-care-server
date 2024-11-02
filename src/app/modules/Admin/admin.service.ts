@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { AdminSearchableFields } from "./admin.constant";
+import calculatePagination from "../../utils/calculatePagination";
 
 const prisma = new PrismaClient();
 
@@ -14,6 +15,9 @@ const getAllAdminsService = async (query:any) => {
         }
     }))
 
+
+
+    const pagination = calculatePagination({page, limit, sortBy, sortOrder});
 
 
 
