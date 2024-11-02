@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { deleteAdminService, getAllAdminsService, getSingleAdminService, updateAdminService } from "./admin.service";
+import { deleteAdminService, getAllAdminsService, getSingleAdminService, softDeleteAdminService, updateAdminService } from "./admin.service";
 import { AdminValidFields } from "./admin.constant";
 import pickValidFields from "../../utils/pickValidFields";
 
@@ -92,11 +92,32 @@ const getAllAdmins = async (req: Request, res: Response) => {
   };
 
 
+  const softDeleteAdmin = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+      const result = await softDeleteAdminService(id);
+      res.status(200).json({
+        success: true,
+        message: "Admin is deleted successfully",
+        data: result,
+      });
+    } catch (err: any) {
+      res.status(500).json({
+        success: false,
+        message: err.name || "Something Went Wrong",
+        error: err,
+      });
+    }
+  };
+
+
 
   
   export const adminController = {
       getAllAdmins,
       getSingleAdmin,
       updateAdmin,
-      deleteAdmin
+      deleteAdmin,
+      softDeleteAdmin
   }
