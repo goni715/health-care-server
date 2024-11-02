@@ -104,14 +104,23 @@ const getAllAdminsService = async (query:any) => {
     const whereConditions: Prisma.AdminWhereInput = { AND: andConditions }
 
 
+    // const result = await prisma.admin.findMany({
+    //     where: whereConditions,
+    //     skip: Number(page-1) * limit || 0,
+    //     take: Number(limit) || 10,
+    //     orderBy: sortBy && sortOrder ? {
+    //         [sortBy]: sortOrder
+    //     } : {
+    //         createdAt: 'desc'
+    //     }
+    // });
+
     const result = await prisma.admin.findMany({
         where: whereConditions,
-        skip: Number(page-1) * limit || 0,
-        take: Number(limit) || 10,
-        orderBy: sortBy && sortOrder ? {
-            [sortBy]: sortOrder
-        } : {
-            createdAt: 'desc'
+        skip: pagination.skip,
+        take: pagination.limit,
+        orderBy: {
+            [pagination.sortBy]: pagination.sortOrder
         }
     });
     return result;

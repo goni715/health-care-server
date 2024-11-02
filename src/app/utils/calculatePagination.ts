@@ -6,7 +6,15 @@ type TPagination = {
     sortOrder?: string;
 }
 
-const calculatePagination = (args: TPagination) => {
+type TPaginationResult = {
+    page: number;
+    limit: number;
+    skip: number;
+    sortBy: string;
+    sortOrder: string;
+}
+
+const calculatePagination = (args: TPagination) : TPaginationResult => {
     const page: number = Number(args.page) || 1;
     const limit: number = Number(args.limit) || 10;
     const skip: number = Number(page-1)*limit;
