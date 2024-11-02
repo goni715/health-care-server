@@ -2,25 +2,8 @@ import { Request, Response } from "express";
 import { deleteAdminService, getAllAdminsService, getSingleAdminService, softDeleteAdminService, updateAdminService } from "./admin.service";
 import { AdminValidFields } from "./admin.constant";
 import pickValidFields from "../../utils/pickValidFields";
+import sendResponse from "../../utils/sendResponse";
 
-const sendResponse = <T>(res: Response, jsonData: {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  meta?: {
-    page:number;
-    limit: number;
-    total: number;
-  },
-  data: T | null | undefined
-}) => {
-  res.status(jsonData.statusCode).json({
-    success: jsonData.success,
-    message: jsonData.message,
-    meta: jsonData.meta,
-    data: jsonData.data
-  })
-}
 
 
 const getAllAdmins = async (req: Request, res: Response) => {
