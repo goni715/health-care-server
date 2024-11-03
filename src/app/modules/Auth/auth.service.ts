@@ -1,6 +1,7 @@
+import { TLoginUser } from "./auth.interface"
 
 
-const loginUserService = async(payload:any) => {
+const loginUserService = async(payload:TLoginUser) => {
     return 'Login service'
 }
 
