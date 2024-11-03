@@ -5,4 +5,5 @@ dotenv.config({ path: path.join(process.cwd(), '.env') });
 
 export default {
     bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
+    Node_Env: process.env.NODE_ENV
 }
