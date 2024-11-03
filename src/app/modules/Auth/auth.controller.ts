@@ -14,7 +14,6 @@ const loginUser = catchAsync(async(req, res)=> {
         httpOnly: true,
     })
 
-    console.log(config.Node_Env === "production");
 
     sendResponse(res, {
         statusCode: 200,

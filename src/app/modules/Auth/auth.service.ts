@@ -1,7 +1,8 @@
+import config from "../../config";
 import prisma from "../../shared/prisma"
+import createToken from "../../utils/createToken";
 import { TLoginUser } from "./auth.interface";
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 
 
 const loginUserService = async(payload:TLoginUser) => {
@@ -21,31 +22,26 @@ const loginUserService = async(payload:TLoginUser) => {
         throw new Error('Wrong Password!')
     }
 
+    //token-payload
+    const jwtPayload =  {
+      id: userData.id,
+      email: userData.email,
+      role: userData.role,
+    }
 
-    const accessToken = jwt.sign(
-      {
-        id: userData.id,
-        email: userData.email,
-        role: userData.role,
-      },
-      "secretKey",
-      { algorithm: "HS256", expiresIn: "1h" }
+    const accessToken = createToken(
+      jwtPayload,
+      config.jwt_access_secret as string,
+      config.jwt_access_expires_in as string
+    );
+
+    const refreshToken = createToken(
+      jwtPayload,
+      config.jwt_refresh_secret as string,
+      config.jwt_refresh_expires_in as string
     );
 
 
-    const refreshToken = jwt.sign(
-        {
-          id: userData.id,
-          email: userData.email,
-          role: userData.role,
-        },
-        "secretKeyRefresh",
-        { algorithm: "HS256", expiresIn: "10d" }
-      );
-
-      //console.log(accessToken);
-      const decoded = jwt.verify(accessToken, 'secretKey');
-      console.log(decoded);
 
 
     return {
