@@ -1,10 +1,11 @@
 import { Admin, Prisma, PrismaClient } from "@prisma/client";
 import { AdminSearchableFields } from "./admin.constant";
 import calculatePagination from "../../utils/calculatePagination";
+import { TAdminQuery } from "./admin.interface";
 
 const prisma = new PrismaClient();
 
-const getAllAdminsService = async (query: any) => {
+const getAllAdminsService = async (query: TAdminQuery) => {
   const { searchTerm, page, limit, sortBy, sortOrder, ...filterData } = query;
   const andConditions: Prisma.AdminWhereInput[] = [{ isDeleted: false }];
   //let conditions = {};
@@ -72,7 +73,7 @@ const getAllAdminsService = async (query: any) => {
     andConditions.push({
       AND: Object.keys(filterData).map((key) => ({
         [key]: {
-          equals: filterData[key],
+          equals: (filterData as any)[key],
         },
       })),
     });
