@@ -8,6 +8,7 @@ import { checkPassword } from "./auth.utlis";
 import ApiError from "../../errors/ApiError";
 import hashedPassword from "../../utils/hashedPassword";
 import { Secret } from "jsonwebtoken";
+import sendEmail from "../../utils/sendEmail";
 
 const loginUserService = async (payload: TLoginUser) => {
   const userData = await prisma.user.findUnique({
@@ -192,7 +193,8 @@ const forgotPasswordService = async (email: string) => {
   const restPassLink = config.reset_pass_ui_link+`?email=${userExist.email}&token=${resetToken}`
 
   //send-email
-  return restPassLink;
+  await sendEmail(userExist?.email, restPassLink);
+  return null;
 }
 
 
