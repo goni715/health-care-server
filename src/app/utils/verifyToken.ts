@@ -1,13 +1,8 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
 
-const verifyToken = async (token: string, secretKey: string) => {
-    try{
-        const decoded = jwt.verify(token, secretKey);
-        return decoded;
-    }
-    catch(err){
-        throw new Error('You are not unathorized')
-    }
+const verifyToken = (token: string, secretKey: Secret) => {
+        const decoded = jwt.verify(token, secretKey) as JwtPayload;
+        return decoded;  
 }
 
 

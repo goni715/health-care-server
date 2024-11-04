@@ -33,14 +33,13 @@ const loginUser = catchAsync(async(req, res)=> {
 //get new accessToken by refreshToken
 const refreshToken = catchAsync(async (req, res) => {
     const { refreshToken } = req.cookies;
-    console.log(refreshToken);
-    //const result = await refreshTokenService(refreshToken);
+    const result = await refreshTokenService(refreshToken);
 
     sendResponse(res, {
         statusCode: 200,
         success: true,
-        message: 'User login successfully',
-        data: 'result'
+        message: 'Access token is retrieved successfully !',
+        data: result
     })
 })
 

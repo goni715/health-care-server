@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Secret } from 'jsonwebtoken';
 
 
 type TPayload = {
@@ -7,7 +7,7 @@ type TPayload = {
     role: string;
 }
 
-const createToken = (payload:TPayload, secretKey:string, expiresIn:string) => {
+const createToken = (payload:TPayload, secretKey:Secret, expiresIn:string) => {
     const token = jwt.sign(payload, secretKey, {
        algorithm: "HS256",
        expiresIn
