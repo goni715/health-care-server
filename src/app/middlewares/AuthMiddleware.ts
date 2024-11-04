@@ -7,7 +7,7 @@ import prisma from "../shared/prisma";
 type TUserRole = "admin" | "super_admin" | "doctor" | "patient";
 
 const AuthMiddleware = (...roles: TUserRole[]) => {
-  return async (req: Request, res: Response, next: NextFunction) : Promise<any> => {
+  return async (req: Request & {user?: any}, res: Response, next: NextFunction) : Promise<any> => {
     try {
       const token = req.headers.authorization;
       if (!token) {

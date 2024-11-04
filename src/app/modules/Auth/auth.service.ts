@@ -154,11 +154,39 @@ const changePasswordService = async(id: string, payload: TChangePassword) => {
 
 
 
+const forgotPasswordService = async (email: string) => {
+  const userExist = await prisma.user.findUnique({
+    where: {
+      email
+    }
+  })
 
+
+    //check if the user is not exist
+  if(!userExist){
+    throw new ApiError(404, "Could not Find this Email!")
+  }
+
+  
+  //check if the user is deleted
+  if (userExist.isDeleted) {
+    throw new ApiError(403, "Your acount is deleted")
+  }
+
+  //check if the user is blocked
+  const blockStatus = userExist.status;
+  if (blockStatus === "blocked") {
+    throw new ApiError(403, "Your account is blocked")
+  }
+
+  //send-email
+  return email;
+}
 
 
 export {
    loginUserService,
    refreshTokenService,
-   changePasswordService
+   changePasswordService,
+   forgotPasswordService
 };

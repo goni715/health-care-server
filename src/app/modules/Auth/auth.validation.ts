@@ -52,3 +52,13 @@ export const changePasswordValidationSchema = z.object({
     message: "New Password must not contain Whitespaces!",
   }),
 });
+
+
+export const forgotPasswordValidationSchema = z.object({
+  email: z
+  .string({
+    required_error: "Email is required",
+  })
+  .trim()
+  .email({ message: "Invalid email address" }),
+})
