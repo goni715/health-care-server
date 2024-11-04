@@ -1,7 +1,7 @@
 import config from "../../config";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import { loginUserService } from "./auth.service";
+import { loginUserService, refreshTokenService } from "./auth.service";
 
 
 const loginUser = catchAsync(async(req, res)=> {
@@ -27,6 +27,26 @@ const loginUser = catchAsync(async(req, res)=> {
 })
 
 
+
+
+
+//get new accessToken by refreshToken
+const refreshToken = catchAsync(async (req, res) => {
+    const { refreshToken } = req.cookies;
+    console.log(refreshToken);
+    //const result = await refreshTokenService(refreshToken);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User login successfully',
+        data: 'result'
+    })
+})
+
+
+
 export const AuthController = {
-    loginUser
+    loginUser,
+    refreshToken
 }

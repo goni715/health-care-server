@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import router from "./app/routes";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import notFound from "./app/middlewares/notFound";
@@ -10,6 +11,7 @@ const app: Application = express();
 
 //middleware implementation
 app.use(cors());
+app.use(cookieParser())
 app.use(morgan("dev"));
 
 

@@ -6,7 +6,9 @@ import { loginUserValidationSchema } from './auth.validation';
 const router = express.Router();
 
 
-router.post('/login', validateRequest(loginUserValidationSchema), AuthController.loginUser)
+router.post('/login', validateRequest(loginUserValidationSchema), AuthController.loginUser);
+//get new accessToken by refreshToken
+router.post('/refresh-token', AuthController.refreshToken)
 
 
 
