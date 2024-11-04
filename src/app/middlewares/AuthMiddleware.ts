@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import verifyToken from "../utils/verifyToken";
 import config from "../config";
-import { Secret } from "jsonwebtoken";
+import { JwtPayload, Secret } from "jsonwebtoken";
 import prisma from "../shared/prisma";
 
 type TUserRole = "admin" | "super_admin" | "doctor" | "patient";
@@ -19,24 +19,24 @@ const AuthMiddleware = (...roles: TUserRole[]) => {
       }
 
       //token-verify
-      const { email, role } = verifyToken(
+      const decoded = verifyToken(
         token,
         config.jwt_access_secret as Secret
       );
 
 
       //check if role is matching
-      if (roles.length > 0 && !roles.includes(role)) {
+      if (roles.length > 0 && !roles.includes(decoded.role)) {
         return res.status(401).json({
              success: false,
              message: "You are not authorized",
-             error: `User role is ${role}`
+             error: `User role is ${decoded.role}`
         });
       }
 
       const userExist = await prisma.user.findUnique({
         where: {
-          email,
+          email: decoded.email,
         },
       });
 
@@ -68,6 +68,12 @@ const AuthMiddleware = (...roles: TUserRole[]) => {
         });
       }
 
+      req.user = decoded;
+
+      //set id & email to headers
+      req.headers.email= decoded.email;
+      req.headers.id= decoded.id;
+     
       next()
 
     } catch (err: any) {

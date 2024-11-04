@@ -2,8 +2,11 @@ import config from "../../config";
 import prisma from "../../shared/prisma";
 import createToken from "../../utils/createToken";
 import verifyToken from "../../utils/verifyToken";
-import { TLoginUser } from "./auth.interface";
+import { TChangePassword, TLoginUser } from "./auth.interface";
 import bcrypt from "bcryptjs";
+import { checkPassword } from "./auth.utlis";
+import ApiError from "../../errors/ApiError";
+import hashedPassword from "../../utils/hashedPassword";
 
 const loginUserService = async (payload: TLoginUser) => {
   const userData = await prisma.user.findUnique({
@@ -114,8 +117,39 @@ const refreshTokenService = async (token: string) => {
 
 
 
-const changePasswordService = async() => {
-  return 'change password service'
+const changePasswordService = async(id: string, payload: TChangePassword) => {
+  const { oldPassword, newPassword } = payload;
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  //checking if the password is not correct
+  const isPasswordMatched = await checkPassword(
+    oldPassword,
+    user?.password as string
+  ); //return true or false
+
+ if(!isPasswordMatched){
+  throw new ApiError(403, 'Wrong Old Password');
+ }
+
+
+ //update-password
+ const result = await prisma.user.update({
+  where: {
+    id
+  },
+  data: {
+    password: await hashedPassword(newPassword),
+    needPasswordChange: false
+  }
+ });
+
+
+
+  return true;
 }
 
 

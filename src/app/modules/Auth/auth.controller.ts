@@ -46,7 +46,8 @@ const refreshToken = catchAsync(async (req, res) => {
 
 
 const changePassword = catchAsync(async (req, res) => {
-    const result = await changePasswordService()
+    const { id } = req.headers;
+    const result = await changePasswordService(id as string, req.body);
 
     sendResponse(res, {
         statusCode: 200,
