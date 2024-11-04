@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 
-router.post('/create-admin', AuthMiddleware('admin'), userController.createAdmin)
+router.post('/create-admin', AuthMiddleware('admin', 'super_admin'), userController.createAdmin)
 
 
 

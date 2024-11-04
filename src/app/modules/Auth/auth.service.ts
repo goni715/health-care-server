@@ -112,4 +112,19 @@ const refreshTokenService = async (token: string) => {
 
 };
 
-export { loginUserService, refreshTokenService };
+
+
+const changePasswordService = async() => {
+  return 'change password service'
+}
+
+
+
+
+
+
+export {
+   loginUserService,
+   refreshTokenService,
+   changePasswordService
+};
