@@ -1,7 +1,7 @@
 import config from "../../config";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import { changePasswordService, forgotPasswordService, loginUserService, refreshTokenService } from "./auth.service";
+import { changePasswordService, forgotPasswordService, loginUserService, refreshTokenService, resetPasswordService } from "./auth.service";
 
 
 const loginUser = catchAsync(async(req, res)=> {
@@ -73,9 +73,23 @@ const forgotPassword = catchAsync(async (req, res) => {
 })
 
 
+
+const resetPassword = catchAsync(async (req, res) => {
+    const result = await resetPasswordService(req.body);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Password is reset successfully !',
+        data: result
+    })
+})
+
+
 export const AuthController = {
     loginUser,
     refreshToken,
     changePassword,
-    forgotPassword
+    forgotPassword,
+    resetPassword
 }

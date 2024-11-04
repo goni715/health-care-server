@@ -2,7 +2,7 @@ import config from "../../config";
 import prisma from "../../shared/prisma";
 import createToken from "../../utils/createToken";
 import verifyToken from "../../utils/verifyToken";
-import { TChangePassword, TLoginUser } from "./auth.interface";
+import { TChangePassword, TLoginUser, TResetPassword } from "./auth.interface";
 import bcrypt from "bcryptjs";
 import { checkPassword } from "./auth.utlis";
 import ApiError from "../../errors/ApiError";
@@ -150,7 +150,6 @@ const changePasswordService = async(id: string, payload: TChangePassword) => {
  });
 
 
-
   return true;
 }
 
@@ -198,9 +197,54 @@ const forgotPasswordService = async (email: string) => {
 }
 
 
+const resetPasswordService = async (payload: TResetPassword) => {
+  const { email, newPassword, token } = payload;
+
+  try {
+    //verify-token
+    verifyToken(token, config.reset_secret as Secret);
+  } catch (err) {
+    throw new ApiError(403, "Invalid Token or Expired token");
+  }
+
+  const userExist = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  //check if the user is not exist
+  if (!userExist) {
+    throw new ApiError(404, "Could not Find this Email!");
+  }
+
+  //check if the user is deleted
+  if (userExist.isDeleted) {
+    throw new ApiError(403, "Your acount is deleted");
+  }
+
+  //check if the user is blocked
+  const blockStatus = userExist.status;
+  if (blockStatus === "blocked") {
+    throw new ApiError(403, "Your account is blocked");
+  }
+
+  //update-password
+  await prisma.user.update({
+    where: {
+      email: userExist.email,
+    },
+    data: {
+      password: await hashedPassword(newPassword),
+      needPasswordChange: false,
+    },
+  });
+};
+
 export {
    loginUserService,
    refreshTokenService,
    changePasswordService,
-   forgotPasswordService
+   forgotPasswordService,
+   resetPasswordService
 };
