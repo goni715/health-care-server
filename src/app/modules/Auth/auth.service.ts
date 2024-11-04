@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { checkPassword } from "./auth.utlis";
 import ApiError from "../../errors/ApiError";
 import hashedPassword from "../../utils/hashedPassword";
+import { Secret } from "jsonwebtoken";
 
 const loginUserService = async (payload: TLoginUser) => {
   const userData = await prisma.user.findUnique({
@@ -179,8 +180,19 @@ const forgotPasswordService = async (email: string) => {
     throw new ApiError(403, "Your account is blocked")
   }
 
+  
+  //token-payload
+  const jwtPayload = {
+    id: userExist.id,
+    email: userExist.email,
+    role: userExist.role,
+  };
+
+  const resetToken = createToken(jwtPayload, config.reset_secret as Secret, config.reset_expires_in as string);
+  const restPassLink = config.reset_pass_ui_link+`?email=${userExist.email}&token=${resetToken}`
+
   //send-email
-  return email;
+  return restPassLink;
 }
 
 
