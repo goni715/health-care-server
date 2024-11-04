@@ -21,3 +21,10 @@ export const loginUserValidationSchema = z.object({
       message: "Password must not contain Whitespaces!", //"Name must only contain letters and spaces"
     }),
 });
+
+
+export const refreshTokenValidationSchema = z.object({
+  refreshToken: z.string({
+      required_error: 'Refresh token is required !'
+  })
+})
