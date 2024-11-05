@@ -3,6 +3,7 @@ import hashedPassword from "../../utils/hashedPassword";
 import { TAdmin } from "../Admin/admin.interface";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary";
 import { TDoctor } from "../Doctor/doctor.interface";
+import { TPatient } from "../Patient/patient.interface";
 
 const prisma = new PrismaClient()
 
@@ -98,16 +99,16 @@ const createDoctorService = async (file:any, payload: TDoctor) => {
 };
 
 
-const createPatientService = async (file:any, payload: TDoctor) => {
+const createPatientService = async (file:any, payload: TPatient) => {
   const userData = {
-    email: payload.doctorData.email,
+    email: payload.patientData.email,
     password: await hashedPassword(payload.password),
     role: UserRole.doctor,
   };
 
   const userExist = await prisma.user.findUnique({
     where: {
-      email: payload.doctorData.email,
+      email: payload.patientData.email,
     },
   });
 
@@ -120,26 +121,26 @@ const createPatientService = async (file:any, payload: TDoctor) => {
     //if there is a file -- upload image to cloudinary
     if (file) {
       const cloudinaryRes = await uploadImageToCloudinary(file?.path);
-      payload.doctorData.profilePhoto = cloudinaryRes?.secure_url;
+      payload.patientData.profilePhoto = cloudinaryRes?.secure_url;
     }
 
   const result = await prisma.$transaction(async (transactionClient) => {
     //query-01
-    const createUser = await transactionClient.user.create({
+    const createdUser = await transactionClient.user.create({
       data: userData,
     });
 
     //query-02
-    const createDoctor = await transactionClient.doctor.create({
-      data: payload.doctorData
+    const createdPatient = await transactionClient.patient.create({
+      data: payload.patientData
     })
     return {
-      createUser,
-      createDoctor,
+      createdUser,
+      createdPatient,
     };
   });
 
-  return result.createDoctor;
+  return result.createdPatient;
 };
 
 export {

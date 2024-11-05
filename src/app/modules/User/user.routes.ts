@@ -46,7 +46,7 @@ router.post(
     next();
   },
   validateRequest(createPatientSchema),
-  UserController.createDoctor
+  UserController.createPatient
 );
 
 
