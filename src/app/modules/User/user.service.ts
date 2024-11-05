@@ -98,7 +98,52 @@ const createDoctorService = async (file:any, payload: TDoctor) => {
 };
 
 
+const createPatientService = async (file:any, payload: TDoctor) => {
+  const userData = {
+    email: payload.doctorData.email,
+    password: await hashedPassword(payload.password),
+    role: UserRole.doctor,
+  };
+
+  const userExist = await prisma.user.findUnique({
+    where: {
+      email: payload.doctorData.email,
+    },
+  });
+
+  //check email is already exist
+  if (userExist) {
+    throw new Error("This email is already existed");
+  }
+
+
+    //if there is a file -- upload image to cloudinary
+    if (file) {
+      const cloudinaryRes = await uploadImageToCloudinary(file?.path);
+      payload.doctorData.profilePhoto = cloudinaryRes?.secure_url;
+    }
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    //query-01
+    const createUser = await transactionClient.user.create({
+      data: userData,
+    });
+
+    //query-02
+    const createDoctor = await transactionClient.doctor.create({
+      data: payload.doctorData
+    })
+    return {
+      createUser,
+      createDoctor,
+    };
+  });
+
+  return result.createDoctor;
+};
+
 export {
     createAdminService,
-    createDoctorService
+    createDoctorService,
+    createPatientService
 }

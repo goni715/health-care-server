@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createAdminService, createDoctorService } from "./user.service";
+import { createAdminService, createDoctorService, createPatientService } from "./user.service";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 
@@ -35,9 +35,19 @@ const createDoctor = catchAsync(async (req, res) => {
 })
 
 
+const createPatient = catchAsync(async (req, res) => {
+  const result =  await createPatientService(req.file, req.body);
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "Patient is created successfully",
+    data: result
+  })
+})
 
 
 export const UserController = {
     createAdmin,
-    createDoctor
+    createDoctor,
+    createPatient
 }

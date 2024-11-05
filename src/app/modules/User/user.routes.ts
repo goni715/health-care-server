@@ -5,6 +5,7 @@ import validateRequest from '../../middlewares/validateRequest';
 import { createAdminValidationSchema } from '../Admin/admin.validation';
 import { UserController } from './user.controller';
 import { createDoctorSchema } from '../Doctor/doctor.validation';
+import { createPatientSchema } from '../Patient/patient.validation';
 
 const router = express.Router();
 
@@ -12,26 +13,39 @@ const router = express.Router();
 
 router.post(
   "/create-admin",
+  AuthMiddleware("admin", "super_admin"),
   upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
   },
   validateRequest(createAdminValidationSchema),
-  AuthMiddleware("admin", "super_admin"),
   UserController.createAdmin
 );
 
 
 router.post(
   "/create-doctor",
+  AuthMiddleware("admin", "super_admin"),
   upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
   },
   validateRequest(createDoctorSchema),
-  AuthMiddleware("admin", "super_admin"),
+  UserController.createDoctor
+);
+
+
+
+router.post(
+  "/create-patient",
+  upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
+  validateRequest(createPatientSchema),
   UserController.createDoctor
 );
 
