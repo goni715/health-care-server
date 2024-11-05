@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
-import { creatAdminService } from "./user.service";
+import { createAdminService, createDoctorService } from "./user.service";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 
 
 const createAdmin = async (req: Request, res: Response) => {
   try{
-    const result =  await creatAdminService(req.file, req.body);
+    const result =  await createAdminService(req.file, req.body);
     res.status(201).json({
       success: true,
       message: "Admin is created successfully",
@@ -21,6 +23,21 @@ const createAdmin = async (req: Request, res: Response) => {
 }
 
 
-export const userController = {
-    createAdmin
+
+const createDoctor = catchAsync(async (req, res) => {
+  const result =  await createDoctorService(req.file, req.body);
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: "Doctor is created successfully",
+    data: result
+  })
+})
+
+
+
+
+export const UserController = {
+    createAdmin,
+    createDoctor
 }
