@@ -5,7 +5,6 @@ import ApiError from "../errors/ApiError";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log(process.cwd()+'/uploads');
       cb(null, process.cwd()+'/uploads')
     },
     filename: function (req, file, cb) {
@@ -24,6 +23,7 @@ const fileFilter = function (req:Request, file:Express.Multer.File, cb: (error: 
   const mimeType = allowedExtensions.test(file.mimetype);
   const extName = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
 
+
   if (mimeType && extName) {
     cb(null, true);
   } else {
@@ -31,10 +31,19 @@ const fileFilter = function (req:Request, file:Express.Multer.File, cb: (error: 
   }
 };
 
+
+ //1 MB = 1024 KB
+ //1 KB = 1024 bytes
+//const fileSize= 1024 * 1024 * 2 = 2097152 bytes = 2MB
+const fileSize = 1048576 //1MB
+
   
   const upload = multer({
      storage: storage,
-     fileFilter
+     fileFilter,
+     limits: {
+      fileSize: fileSize
+     }
   });
 
   export default upload;
