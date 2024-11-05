@@ -2,6 +2,7 @@ import { PrismaClient, UserRole } from "@prisma/client";
 import hashedPassword from "../../utils/hashedPassword";
 import { TAdmin } from "../Admin/admin.interface";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary";
+import { TDoctor } from "../Doctor/doctor.interface";
 
 const prisma = new PrismaClient()
 
@@ -52,16 +53,16 @@ const createAdminService = async (file:any, payload: TAdmin) => {
 };
 
 
-const createDoctorService = async (file:any, payload: TAdmin) => {
+const createDoctorService = async (file:any, payload: TDoctor) => {
   const userData = {
-    email: payload.adminData.email,
+    email: payload.doctorData.email,
     password: await hashedPassword(payload.password),
-    role: UserRole.admin,
+    role: UserRole.doctor,
   };
 
   const userExist = await prisma.user.findUnique({
     where: {
-      email: payload.adminData.email,
+      email: payload.doctorData.email,
     },
   });
 
@@ -74,28 +75,26 @@ const createDoctorService = async (file:any, payload: TAdmin) => {
     //if there is a file -- upload image to cloudinary
     if (file) {
       const cloudinaryRes = await uploadImageToCloudinary(file?.path);
-      payload.adminData.profilePhoto = cloudinaryRes?.secure_url;
+      payload.doctorData.profilePhoto = cloudinaryRes?.secure_url;
     }
 
-  // const result = await prisma.$transaction(async (transactionClient) => {
-  //   //query-01
-  //   const createUser = await transactionClient.user.create({
-  //     data: userData,
-  //   });
+  const result = await prisma.$transaction(async (transactionClient) => {
+    //query-01
+    const createUser = await transactionClient.user.create({
+      data: userData,
+    });
 
-  //   //query-02
-  //   const createAdmin = await transactionClient.admin.create({
-  //     data: payload.adminData,
-  //   });
+    //query-02
+    const createDoctor = await transactionClient.doctor.create({
+      data: payload.doctorData
+    })
+    return {
+      createUser,
+      createDoctor,
+    };
+  });
 
-  //   return {
-  //     createUser,
-  //     createAdmin,
-  //   };
-  // });
-
-  //return result.createAdmin;
-  return payload
+  return result.createDoctor;
 };
 
 
