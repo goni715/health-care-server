@@ -8,10 +8,9 @@ import { TUserQuery } from "./user.interface";
 import { UserSearchableFields } from "./user.constant";
 import calculatePagination from "../../utils/calculatePagination";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-
-const createAdminService = async (file:any, payload: TAdmin) => {
+const createAdminService = async (file: any, payload: TAdmin) => {
   const userData = {
     email: payload.adminData.email,
     password: await hashedPassword(payload.password),
@@ -29,12 +28,11 @@ const createAdminService = async (file:any, payload: TAdmin) => {
     throw new Error("This email is already existed");
   }
 
-
-    //if there is a file -- upload image to cloudinary
-    if (file) {
-      const cloudinaryRes = await uploadImageToCloudinary(file?.path);
-      payload.adminData.profilePhoto = cloudinaryRes?.secure_url;
-    }
+  //if there is a file -- upload image to cloudinary
+  if (file) {
+    const cloudinaryRes = await uploadImageToCloudinary(file?.path);
+    payload.adminData.profilePhoto = cloudinaryRes?.secure_url;
+  }
 
   const result = await prisma.$transaction(async (transactionClient) => {
     //query-01
@@ -56,8 +54,7 @@ const createAdminService = async (file:any, payload: TAdmin) => {
   return result.createAdmin;
 };
 
-
-const createDoctorService = async (file:any, payload: TDoctor) => {
+const createDoctorService = async (file: any, payload: TDoctor) => {
   const userData = {
     email: payload.doctorData.email,
     password: await hashedPassword(payload.password),
@@ -75,12 +72,11 @@ const createDoctorService = async (file:any, payload: TDoctor) => {
     throw new Error("This email is already existed");
   }
 
-
-    //if there is a file -- upload image to cloudinary
-    if (file) {
-      const cloudinaryRes = await uploadImageToCloudinary(file?.path);
-      payload.doctorData.profilePhoto = cloudinaryRes?.secure_url;
-    }
+  //if there is a file -- upload image to cloudinary
+  if (file) {
+    const cloudinaryRes = await uploadImageToCloudinary(file?.path);
+    payload.doctorData.profilePhoto = cloudinaryRes?.secure_url;
+  }
 
   const result = await prisma.$transaction(async (transactionClient) => {
     //query-01
@@ -90,8 +86,8 @@ const createDoctorService = async (file:any, payload: TDoctor) => {
 
     //query-02
     const createDoctor = await transactionClient.doctor.create({
-      data: payload.doctorData
-    })
+      data: payload.doctorData,
+    });
     return {
       createUser,
       createDoctor,
@@ -101,8 +97,7 @@ const createDoctorService = async (file:any, payload: TDoctor) => {
   return result.createDoctor;
 };
 
-
-const createPatientService = async (file:any, payload: TPatient) => {
+const createPatientService = async (file: any, payload: TPatient) => {
   const userData = {
     email: payload.patientData.email,
     password: await hashedPassword(payload.password),
@@ -120,12 +115,11 @@ const createPatientService = async (file:any, payload: TPatient) => {
     throw new Error("This email is already existed");
   }
 
-
-    //if there is a file -- upload image to cloudinary
-    if (file) {
-      const cloudinaryRes = await uploadImageToCloudinary(file?.path);
-      payload.patientData.profilePhoto = cloudinaryRes?.secure_url;
-    }
+  //if there is a file -- upload image to cloudinary
+  if (file) {
+    const cloudinaryRes = await uploadImageToCloudinary(file?.path);
+    payload.patientData.profilePhoto = cloudinaryRes?.secure_url;
+  }
 
   const result = await prisma.$transaction(async (transactionClient) => {
     //query-01
@@ -135,8 +129,8 @@ const createPatientService = async (file:any, payload: TPatient) => {
 
     //query-02
     const createdPatient = await transactionClient.patient.create({
-      data: payload.patientData
-    })
+      data: payload.patientData,
+    });
     return {
       createdUser,
       createdPatient,
@@ -146,10 +140,9 @@ const createPatientService = async (file:any, payload: TPatient) => {
   return result.createdPatient;
 };
 
-
 const getAllUsersService = async (query: TUserQuery) => {
   const { searchTerm, page, limit, sortBy, sortOrder, ...filterData } = query;
-  const andConditions: Prisma.UserWhereInput[] = [{ isDeleted: false }];
+  const andConditions: Prisma.UserWhereInput[] = [];
   const searchQuery = UserSearchableFields.map((item) => ({
     [item]: {
       contains: query?.searchTerm,
@@ -176,7 +169,6 @@ const getAllUsersService = async (query: TUserQuery) => {
     });
   }
 
-
   // whereConditions
   const whereConditions: Prisma.UserWhereInput = { AND: andConditions };
 
@@ -187,6 +179,24 @@ const getAllUsersService = async (query: TUserQuery) => {
     orderBy: {
       [pagination.sortBy]: pagination.sortOrder,
     },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      needPasswordChange: true,
+      status: true,
+      isDeleted: true,
+      createdAt: true,
+      updatedAt: true,
+      // admin: true,
+      // doctor: true,
+      // patient: true
+    },
+    // include: {
+    //   admin: true,
+    //   doctor: true,
+    //   patient: true,
+    // },
   });
 
   const total = await prisma.user.count({
@@ -197,6 +207,7 @@ const getAllUsersService = async (query: TUserQuery) => {
     meta: {
       page: pagination.page,
       limit: pagination.limit,
+      totalPages: Math.ceil(total / pagination.limit),
       total,
     },
     data: result,
@@ -204,9 +215,37 @@ const getAllUsersService = async (query: TUserQuery) => {
 };
 
 
-export {
-    createAdminService,
-    createDoctorService,
-    createPatientService,
-    getAllUsersService
+
+const changeStatusService = async (id: string, payload: { status: 'active' | 'blocked' }) => {
+  const userExist = await prisma.user.findUnique({
+    where: {
+      id
+    },
+  });
+
+  //check email is already exist
+  if (!userExist) {
+    throw new Error("User Not Found");
+  }
+
+
+  //update status
+  const result = await prisma.user.update({
+    where: {
+      id
+    },
+    data: payload
+  })
+
+
+   return result;
 }
+
+
+export {
+  createAdminService,
+  createDoctorService,
+  createPatientService,
+  getAllUsersService,
+  changeStatusService
+};

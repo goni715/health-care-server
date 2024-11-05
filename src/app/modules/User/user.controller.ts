@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createAdminService, createDoctorService, createPatientService, getAllUsersService } from "./user.service";
+import { changeStatusService, createAdminService, createDoctorService, createPatientService, getAllUsersService } from "./user.service";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import pickValidFields from "../../utils/pickValidFields";
@@ -62,9 +62,21 @@ const getAllUsers = catchAsync(async (req, res) => {
 })
 
 
+const changeStatus = catchAsync(async (req, res) => {
+  const {id} = req.params;
+  const result = await changeStatusService(id, req.body);
+  res.status(200).json({
+    status: true,
+    message: 'Status is updated successfully',
+    data: result
+  });
+});
+
+
 export const UserController = {
     createAdmin,
     createDoctor,
     createPatient,
-    getAllUsers
+    getAllUsers,
+    changeStatus
 }

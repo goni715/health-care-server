@@ -1,4 +1,4 @@
-export const UserSearchableFields = ["email"];
+export const UserSearchableFields: string[] = ["email"];
 export const UserValidFields: string[] = [
   "searchTerm",
   "page",
@@ -7,4 +7,5 @@ export const UserValidFields: string[] = [
   "sortOrder",
   "email",
   "role",
+  "status"
 ];

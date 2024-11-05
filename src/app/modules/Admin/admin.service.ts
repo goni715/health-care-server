@@ -124,6 +124,7 @@ const getAllAdminsService = async (query: TAdminQuery) => {
     meta: {
       page: pagination.page,
       limit: pagination.limit,
+      totalPages : Math.ceil(total / pagination.limit),
       total,
     },
     data: result,

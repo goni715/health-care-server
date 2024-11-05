@@ -6,6 +6,6 @@ export type TUserQuery = {
     sortOrder?: string;
     email?: string;
     role?: string;
-
+    status?: string;
   };
   
