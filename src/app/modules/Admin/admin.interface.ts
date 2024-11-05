@@ -16,6 +16,7 @@ export type TAdmin = {
   adminData: {
     name: string
     email: string
-    contactNumber: string
+    contactNumber: string,
+    profilePhoto?: string;
   };
 };
