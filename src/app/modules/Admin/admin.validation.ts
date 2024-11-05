@@ -46,7 +46,6 @@ export const createAdminValidationSchema = z.object({
       .refine((value) => MobileRegx.test(value), {
         message: "Invalid Mobile Number",
       })
-      .optional(),
   }),
 });
 
