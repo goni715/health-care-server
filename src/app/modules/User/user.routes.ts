@@ -6,6 +6,7 @@ import { createAdminValidationSchema } from '../Admin/admin.validation';
 import { UserController } from './user.controller';
 import { createDoctorSchema } from '../Doctor/doctor.validation';
 import { createPatientSchema } from '../Patient/patient.validation';
+import { UserRole } from '@prisma/client';
 
 const router = express.Router();
 
@@ -48,6 +49,9 @@ router.post(
   validateRequest(createPatientSchema),
   UserController.createPatient
 );
+
+
+router.get('/get-all-users', AuthMiddleware(UserRole.admin, UserRole.super_admin), UserController.getAllUsers);
 
 
 

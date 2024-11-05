@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
-import { createAdminService, createDoctorService, createPatientService } from "./user.service";
+import { createAdminService, createDoctorService, createPatientService, getAllUsersService } from "./user.service";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
+import pickValidFields from "../../utils/pickValidFields";
+import { UserValidFields } from "./user.constant";
 
 
 const createAdmin = async (req: Request, res: Response) => {
@@ -46,8 +48,23 @@ const createPatient = catchAsync(async (req, res) => {
 })
 
 
+
+const getAllUsers = catchAsync(async (req, res) => {
+  const validatedQuery = pickValidFields(req.query, UserValidFields);
+  const result = await getAllUsersService(validatedQuery);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Users are retrieved successfully",
+    meta: result.meta,
+    data: result.data
+  })
+})
+
+
 export const UserController = {
     createAdmin,
     createDoctor,
-    createPatient
+    createPatient,
+    getAllUsers
 }
