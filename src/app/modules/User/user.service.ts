@@ -322,9 +322,11 @@ const getMyProfileService = async (email: string, role: UserRole) => {
 
 const updateMyProfileService = async (email: string, role: UserRole, payload: TUpdateProfile) => {
 
+  let profileData;
+
   //if role is admin
   if (role === "admin" && payload.adminData) {
-    await prisma.admin.update({
+    profileData = await prisma.admin.update({
       where: {
         email,
       },
@@ -334,7 +336,7 @@ const updateMyProfileService = async (email: string, role: UserRole, payload: TU
 
   //if role is doctor
   if (role === "doctor" && payload.doctorData) {
-    await prisma.doctor.update({
+    profileData = await prisma.doctor.update({
       where: {
         email,
       },
@@ -344,7 +346,7 @@ const updateMyProfileService = async (email: string, role: UserRole, payload: TU
 
   //if role is patient
   if (role === "patient" && payload.patientData) {
-    await prisma.patient.update({
+    profileData = await prisma.patient.update({
       where: {
         email,
       },
@@ -353,7 +355,7 @@ const updateMyProfileService = async (email: string, role: UserRole, payload: TU
   }
 
 
-   return null
+   return profileData;
 };
 
 export {
