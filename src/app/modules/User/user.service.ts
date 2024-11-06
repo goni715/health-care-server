@@ -214,12 +214,13 @@ const getAllUsersService = async (query: TUserQuery) => {
   };
 };
 
-
-
-const changeStatusService = async (id: string, payload: { status: 'active' | 'blocked' }) => {
+const changeStatusService = async (
+  id: string,
+  payload: { status: "active" | "blocked" }
+) => {
   const userExist = await prisma.user.findUnique({
     where: {
-      id
+      id,
     },
   });
 
@@ -228,24 +229,74 @@ const changeStatusService = async (id: string, payload: { status: 'active' | 'bl
     throw new Error("User Not Found");
   }
 
-
   //update status
   const result = await prisma.user.update({
     where: {
-      id
+      id,
     },
-    data: payload
-  })
+    data: payload,
+  });
 
+  return result;
+};
 
-   return result;
-}
+const getMyProfileService = async (email: string, role: UserRole) => {
+  let profileData;
 
+  //if role is admin
+  if (role === "admin") {
+    profileData = await prisma.admin.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
+  //if role is doctor
+  if (role === "doctor") {
+    profileData = await prisma.doctor.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
+  //if role is patient
+  if (role === "patient") {
+    profileData = await prisma.patient.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
+  //if role is patient
+  if (role === "super_admin") {
+    profileData = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        needPasswordChange: true,
+        status: true,
+        isDeleted: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  return profileData;
+};
 
 export {
   createAdminService,
   createDoctorService,
   createPatientService,
   getAllUsersService,
-  changeStatusService
+  changeStatusService,
+  getMyProfileService,
 };

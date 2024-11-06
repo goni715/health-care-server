@@ -61,4 +61,7 @@ router.patch(
   UserController.changeStatus
 );
 
+router.get('/get-my-profile', AuthMiddleware("admin", 'super_admin', 'doctor', 'patient'), UserController.getMyProfile);
+
+
 export const UserRoutes = router;

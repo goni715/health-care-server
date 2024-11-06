@@ -12,11 +12,11 @@ export default [
   {
     rules: {
       "no-unused-vars": "error",
-      //"no-undef": "error",
+      "no-undef": "error",
       "no-unused-expressions": "error",
       "prefer-const": "warn",
-      //"no-console": "warn",
-      "no-empty-object-type": "error"
+      "no-used": "error",
+      "no-empty-object-type": "error",
     }
   }
 ];
