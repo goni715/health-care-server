@@ -64,4 +64,10 @@ router.patch(
 router.get('/get-my-profile', AuthMiddleware("admin", 'super_admin', 'doctor', 'patient'), UserController.getMyProfile);
 
 
+router.patch(
+  '/update-my-profile',
+  AuthMiddleware('admin', 'super_admin', 'doctor', 'patient'),
+  UserController.updateMyProfile
+);
+
 export const UserRoutes = router;

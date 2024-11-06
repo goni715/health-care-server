@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { changeStatusService, createAdminService, createDoctorService, createPatientService, getAllUsersService, getMyProfileService } from "./user.service";
+import { changeStatusService, createAdminService, createDoctorService, createPatientService, getAllUsersService, getMyProfileService, updateMyProfileService } from "./user.service";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import pickValidFields from "../../utils/pickValidFields";
@@ -79,7 +79,6 @@ const changeStatus = catchAsync(async (req, res) => {
 
 const getMyProfile = catchAsync(async (req, res) => {
   const { email, role } = req.headers;
-  console.log(email);
   const result = await getMyProfileService(email as string, role as UserRole);
 
   sendResponse(res, {
@@ -91,6 +90,18 @@ const getMyProfile = catchAsync(async (req, res) => {
 });
 
 
+const updateMyProfile = catchAsync(async (req, res) => {
+  const { email, role } = req.headers;
+  const result = await updateMyProfileService(email as string, role as UserRole, req.body);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "My Profile is updated successfully",
+    data: result,
+  });
+});
+
 
 
 
@@ -100,5 +111,6 @@ export const UserController = {
     createPatient,
     getAllUsers,
     changeStatus,
-    getMyProfile
+    getMyProfile,
+    updateMyProfile
 }

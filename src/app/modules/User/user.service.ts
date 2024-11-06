@@ -320,6 +320,68 @@ const getMyProfileService = async (email: string, role: UserRole) => {
   };
 };
 
+const updateMyProfileService = async (email: string, role: UserRole, payload) => {
+
+  let profileData;
+
+  console.log(payload);
+
+  //if role is admin
+  if (role === "admin") {
+    profileData = await prisma.admin.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        name: true,
+        profilePhoto: true,
+        contactNumber:true
+     }
+    });
+  }
+
+  //if role is doctor
+  if (role === "doctor") {
+    profileData = await prisma.doctor.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        name: true,
+        profilePhoto: true,
+        contactNumber: true,
+        address: true,
+        registrationNumber: true,
+        experience: true,
+        gender: true,
+        appointmentFee: true,
+        qualification: true,
+        currentWorkingPlace: true,
+        designation: true,
+      },
+    });
+  }
+
+  //if role is patient
+  if (role === "patient") {
+    profileData = await prisma.patient.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        name: true,
+        profilePhoto: true,
+        contactNumber:true,
+        address: true
+     }
+    });
+  }
+
+
+
+  return null
+};
+
 export {
   createAdminService,
   createDoctorService,
@@ -327,4 +389,5 @@ export {
   getAllUsersService,
   changeStatusService,
   getMyProfileService,
+  updateMyProfileService
 };
