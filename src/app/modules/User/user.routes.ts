@@ -7,7 +7,7 @@ import { UserController } from './user.controller';
 import { createDoctorSchema } from '../Doctor/doctor.validation';
 import { createPatientSchema } from '../Patient/patient.validation';
 import { UserRole } from '@prisma/client';
-import { changeStatusValidationSchema } from './user.validation';
+import { changeStatusValidationSchema, updateMyProfileSchema } from './user.validation';
 
 const router = express.Router();
 
@@ -67,6 +67,7 @@ router.get('/get-my-profile', AuthMiddleware("admin", 'super_admin', 'doctor', '
 router.patch(
   '/update-my-profile',
   AuthMiddleware('admin', 'super_admin', 'doctor', 'patient'),
+  validateRequest(updateMyProfileSchema),
   UserController.updateMyProfile
 );
 

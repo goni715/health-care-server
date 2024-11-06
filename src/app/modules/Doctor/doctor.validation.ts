@@ -34,8 +34,7 @@ export const createDoctorSchema = z.object({
       })
       .refine((value) => /^[A-Za-z\s]+$/.test(value), {
         message: "Name must only contain alphabets", //"Name must only contain letters
-      })
-      .optional(),
+      }),
     contactNumber: z
       .string()
       .trim()

@@ -36,8 +36,7 @@ export const createAdminValidationSchema = z.object({
       })
       .refine((value) => /^[A-Za-z\s]+$/.test(value), {
         message: "Name must only contain alphabets", //"Name must only contain letters and spaces"
-      })
-      .optional(),
+      }),
     contactNumber: z
       .string()
       .trim()
@@ -65,8 +64,7 @@ export const updateAdminValidationSchema = z.object({
     })
     .refine((value) => /^[A-Za-z\s]+$/.test(value), {
       message: "Name must only contain alphabets", //"Name must only contain letters and spaces"
-    })
-    .optional(),
+    }).optional(),
   contactNumber: z
     .string()
     .trim()
