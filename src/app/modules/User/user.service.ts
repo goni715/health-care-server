@@ -241,6 +241,24 @@ const changeStatusService = async (
 };
 
 const getMyProfileService = async (email: string, role: UserRole) => {
+
+  const user = await prisma.user.findUnique({
+    where :{
+      email
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      needPasswordChange: true,
+      status: true,
+      isDeleted: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  })
+
+
   let profileData;
 
   //if role is admin
@@ -249,6 +267,11 @@ const getMyProfileService = async (email: string, role: UserRole) => {
       where: {
         email,
       },
+      select: {
+        name: true,
+        profilePhoto: true,
+        contactNumber:true
+     }
     });
   }
 
@@ -257,6 +280,19 @@ const getMyProfileService = async (email: string, role: UserRole) => {
     profileData = await prisma.doctor.findUnique({
       where: {
         email,
+      },
+      select: {
+        name: true,
+        profilePhoto: true,
+        contactNumber: true,
+        address: true,
+        registrationNumber: true,
+        experience: true,
+        gender: true,
+        appointmentFee: true,
+        qualification: true,
+        currentWorkingPlace: true,
+        designation: true,
       },
     });
   }
@@ -267,29 +303,21 @@ const getMyProfileService = async (email: string, role: UserRole) => {
       where: {
         email,
       },
-    });
-  }
-
-  //if role is patient
-  if (role === "super_admin") {
-    profileData = await prisma.user.findUnique({
-      where: {
-        email,
-      },
       select: {
-        id: true,
-        email: true,
-        role: true,
-        needPasswordChange: true,
-        status: true,
-        isDeleted: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+        name: true,
+        profilePhoto: true,
+        contactNumber:true,
+        address: true
+     }
     });
   }
 
-  return profileData;
+
+
+  return {
+    ...user,
+    ...profileData
+  };
 };
 
 export {
