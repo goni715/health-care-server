@@ -3,11 +3,11 @@ import sendResponse from "../../utils/sendResponse";
 import { createSpecialtiesService } from "./specialties.service";
 
 const createSpecialties = catchAsync(async (req, res) => {
-    const result =  await createSpecialtiesService(req.body);
+    const result =  await createSpecialtiesService(req.file, req.body);
     sendResponse(res, {
       statusCode: 201,
       success: true,
-      message: "Specialties is created successfully",
+      message: "Specialties created successfully",
       data: result
     })
   })
