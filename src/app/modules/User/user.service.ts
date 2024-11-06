@@ -4,7 +4,7 @@ import { TAdmin } from "../Admin/admin.interface";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary";
 import { TDoctor } from "../Doctor/doctor.interface";
 import { TPatient } from "../Patient/patient.interface";
-import { TUserQuery } from "./user.interface";
+import { TUpdateProfile, TUserQuery } from "./user.interface";
 import { UserSearchableFields } from "./user.constant";
 import calculatePagination from "../../utils/calculatePagination";
 
@@ -320,66 +320,40 @@ const getMyProfileService = async (email: string, role: UserRole) => {
   };
 };
 
-const updateMyProfileService = async (email: string, role: UserRole, payload) => {
-
-  let profileData;
-
-  console.log(payload);
+const updateMyProfileService = async (email: string, role: UserRole, payload: TUpdateProfile) => {
 
   //if role is admin
-  if (role === "admin") {
-    profileData = await prisma.admin.findUnique({
+  if (role === "admin" && payload.adminData) {
+    await prisma.admin.update({
       where: {
         email,
       },
-      select: {
-        name: true,
-        profilePhoto: true,
-        contactNumber:true
-     }
+      data: payload.adminData
     });
   }
 
   //if role is doctor
-  if (role === "doctor") {
-    profileData = await prisma.doctor.findUnique({
+  if (role === "doctor" && payload.doctorData) {
+    await prisma.doctor.update({
       where: {
         email,
       },
-      select: {
-        name: true,
-        profilePhoto: true,
-        contactNumber: true,
-        address: true,
-        registrationNumber: true,
-        experience: true,
-        gender: true,
-        appointmentFee: true,
-        qualification: true,
-        currentWorkingPlace: true,
-        designation: true,
-      },
+      data: payload.doctorData
     });
   }
 
   //if role is patient
-  if (role === "patient") {
-    profileData = await prisma.patient.findUnique({
+  if (role === "patient" && payload.patientData) {
+    await prisma.patient.update({
       where: {
         email,
       },
-      select: {
-        name: true,
-        profilePhoto: true,
-        contactNumber:true,
-        address: true
-     }
+      data: payload.patientData
     });
   }
 
 
-
-  return null
+   return null
 };
 
 export {

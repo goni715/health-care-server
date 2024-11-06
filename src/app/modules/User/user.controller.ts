@@ -5,6 +5,7 @@ import sendResponse from "../../utils/sendResponse";
 import pickValidFields from "../../utils/pickValidFields";
 import { UserValidFields } from "./user.constant";
 import { UserRole } from "@prisma/client";
+import { TUpdateProfile } from "./user.interface";
 
 
 
