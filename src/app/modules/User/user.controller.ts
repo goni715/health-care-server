@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { changeStatusService, createAdminService, createDoctorService, createPatientService, getAllUsersService, getMyProfileService, updateMyProfileService } from "./user.service";
+import { changeStatusService, createAdminService, createDoctorService, createPatientService, getAllUsersService, getMyProfileService, updateMyProfilePhotoService, updateMyProfileService } from "./user.service";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import pickValidFields from "../../utils/pickValidFields";
@@ -104,6 +104,18 @@ const updateMyProfile = catchAsync(async (req, res) => {
 });
 
 
+const updateMyProfilePhoto = catchAsync(async (req, res) => {
+  const { email, role } = req.headers;
+  const result = await updateMyProfilePhotoService(req.file, email as string, role as UserRole);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "My Profile Photo is updated successfully",
+    data: result,
+  });
+});
+
 
 
 export const UserController = {
@@ -113,5 +125,6 @@ export const UserController = {
     getAllUsers,
     changeStatus,
     getMyProfile,
-    updateMyProfile
+    updateMyProfile,
+    updateMyProfilePhoto
 }

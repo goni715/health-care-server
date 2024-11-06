@@ -7,6 +7,9 @@ import { TPatient } from "../Patient/patient.interface";
 import { TUpdateProfile, TUserQuery } from "./user.interface";
 import { UserSearchableFields } from "./user.constant";
 import calculatePagination from "../../utils/calculatePagination";
+import ApiError from "../../errors/ApiError";
+import cloudinary from "../../helper/cloudinary";
+import findPublicId from "../../helper/findPublicId";
 
 const prisma = new PrismaClient();
 
@@ -358,6 +361,100 @@ const updateMyProfileService = async (email: string, role: UserRole, payload: TU
    return profileData;
 };
 
+
+
+const updateMyProfilePhotoService = async (file:Express.Multer.File | undefined, email: string, role: UserRole) => {
+  //check if the file is not exist
+  if (!file) {
+    throw new ApiError(400, "File is required");
+  }
+
+  let profileData;
+
+  //if role is admin
+  if (role === "admin") {
+    profileData = await prisma.admin.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
+  //if role is doctor
+  if (role === "doctor") {
+    profileData = await prisma.doctor.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
+  //if role is patient
+  if (role === "patient") {
+    profileData = await prisma.patient.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
+  if(!profileData){
+    throw new ApiError(404, "User does not exist");
+  }
+
+  //image upload to cloudinary
+  const cloudinaryRes = await uploadImageToCloudinary(file?.path);
+  const profilePhoto = cloudinaryRes?.secure_url;
+
+  let updatedData;
+
+  //if role is admin
+  if (role === "admin") {
+    updatedData = await prisma.admin.update({
+      where: {
+        email,
+      },
+      data: {
+        profilePhoto
+      }
+    });
+  }
+
+  //if role is doctor
+  if (role === "doctor") {
+    updatedData = await prisma.doctor.update({
+      where: {
+        email,
+      },
+      data: {
+        profilePhoto
+      }
+    });
+  }
+
+  //if role is patient
+  if (role === "patient") {
+    updatedData = await prisma.patient.update({
+      where: {
+        email,
+      },
+      data: {
+        profilePhoto
+      }
+    });
+  }
+
+
+  //delete image from cloudinary
+  if(profileData.profilePhoto){
+    const public_id = findPublicId(profileData.profilePhoto);
+    await cloudinary.uploader.destroy(public_id);
+  }
+ 
+  return updatedData;
+};
+
+
 export {
   createAdminService,
   createDoctorService,
@@ -365,5 +462,6 @@ export {
   getAllUsersService,
   changeStatusService,
   getMyProfileService,
-  updateMyProfileService
+  updateMyProfileService,
+  updateMyProfilePhotoService
 };

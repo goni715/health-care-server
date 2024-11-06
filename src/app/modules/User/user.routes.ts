@@ -71,4 +71,11 @@ router.patch(
   UserController.updateMyProfile
 );
 
+router.patch(
+  '/update-my-profile-photo',
+  AuthMiddleware('admin', 'doctor', 'patient'),
+  upload.single('file'),
+  UserController.updateMyProfilePhoto
+);
+
 export const UserRoutes = router;

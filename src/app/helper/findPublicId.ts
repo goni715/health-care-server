@@ -5,6 +5,10 @@ const findPublicId = (url: string) => {
 
   // Split the URL by slashes(/)
   const parts = url.split("/");
-  const public_id = parts[parts.length - 2] + "/" + parts[parts.length - 1];
+  //split the lart parts by dot(.)
+  const lastPart = (parts[parts.length - 1]).split('.')[0]
+  const public_id = parts[parts.length - 2] + "/" + lastPart
   return public_id;
 };
+
+export default findPublicId;
