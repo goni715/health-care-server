@@ -4,6 +4,7 @@ export const DoctorSearchableFields = [
   "contactNumber",
   "address",
   "registrationNumber",
+  "gender",
   "qualification",
   "currentWorkingPlace",
   "designation"
@@ -19,6 +20,7 @@ export const DoctorValidFields: string[] = [
   "contactNumber",
   "address",
   "registrationNumber",
+  "gender",
   "appointmentFee",
   "qualification",
   "currentWorkingPlace",

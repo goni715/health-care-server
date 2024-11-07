@@ -28,6 +28,12 @@ export type TDoctorQuery = {
    name?: string;
    email?: string;
    contactNumber?: string;
+   address?: string;
+   registrationNumber?: string;
+   gender?: 'male' | 'female';
+   qualification?: string;
+   currentWorkingPlace?: string;
+   designation?: string;
  };
  
  

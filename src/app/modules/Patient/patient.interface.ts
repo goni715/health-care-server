@@ -8,3 +8,15 @@ export type TPatient = {
       address?: string;
    };
 };
+
+export type TPatientQuery = {
+   searchTerm?: string;
+   page?: string;
+   limit?: string;
+   sortBy?: string;
+   sortOrder?: 'asc' | 'desc';
+   name?: string;
+   email?: string;
+   contactNumber?: string;
+ };
+ 
