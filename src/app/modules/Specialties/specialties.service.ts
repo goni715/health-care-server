@@ -4,6 +4,8 @@ import { TSpecialties, TSpecialtiesQuery } from "./specialties.interface"
 import calculatePagination from "../../utils/calculatePagination";
 import { SpecialtiesSearchableFields } from "./specialties.constant";
 import ApiError from "../../errors/ApiError";
+import findPublicId from "../../helper/findPublicId";
+import cloudinary from "../../helper/cloudinary";
 
 const prisma = new PrismaClient();
 
@@ -103,9 +105,56 @@ const deleteSpecialtiesService = async (id: string) => {
 };
 
 
+const updateIconService = async (file:Express.Multer.File | undefined, id: string) => {
+  //check if the file is not exist
+  if (!file) {
+    throw new ApiError(400, "File is required");
+  }
+
+  const dataExist = await prisma.specialties.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  //if specialties does not exist
+  if (!dataExist) {
+    throw new ApiError(404, "This id does not exist");
+  }
+
+ 
+
+  //image upload to cloudinary
+  const cloudinaryRes = await uploadImageToCloudinary(file?.path);
+  const icon = cloudinaryRes?.secure_url;
+
+
+
+  const updatedData = await prisma.specialties.update({
+      where: {
+        id
+      },
+      data: {
+        icon
+      }
+    });
+  
+
+
+
+  //delete image from cloudinary
+  if(dataExist.icon){
+    const public_id = findPublicId(dataExist.icon);
+    await cloudinary.uploader.destroy(public_id);
+  }
+ 
+  return updatedData;
+};
+
 
 export {
     createSpecialtiesService,
     getAllSpecialtiesService,
-    deleteSpecialtiesService
+    deleteSpecialtiesService,
+    updateIconService
 }

@@ -26,6 +26,12 @@ router.post(
 
 router.get('/get-all-specialties', AuthMiddleware(UserRole.admin, UserRole.super_admin, UserRole.doctor), SpecialtiesController.getAllSpecialties);
 router.delete('/delete-specialties/:id', AuthMiddleware('admin', 'super_admin', 'doctor', 'patient'), SpecialtiesController.deleteSpecialties)
+router.patch(
+  '/update-icon/:id',
+  AuthMiddleware('admin', 'doctor', 'super_admin'),
+  upload.single('file'),
+  SpecialtiesController.updateIcon
+);
 
 
 export const SpecialtiesRoutes = router;
