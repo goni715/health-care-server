@@ -1,7 +1,7 @@
 import { Admin, Prisma, PrismaClient } from "@prisma/client";
 import { AdminSearchableFields } from "./admin.constant";
-import calculatePaginationSorting from "../../utils/calculatePaginationSorting";
 import { TAdminQuery } from "./admin.interface";
+import { calculatePaginationSorting } from "../../helper/QueryBuilder";
 
 const prisma = new PrismaClient();
 

@@ -1,11 +1,11 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary";
 import { TSpecialties, TSpecialtiesQuery } from "./specialties.interface";
-import calculatePagination from "../../utils/calculatePaginationSorting";
 import { SpecialtiesSearchableFields } from "./specialties.constant";
 import ApiError from "../../errors/ApiError";
 import findPublicId from "../../helper/findPublicId";
 import cloudinary from "../../helper/cloudinary";
+import { calculatePaginationSorting } from "../../helper/QueryBuilder";
 
 const prisma = new PrismaClient();
 
@@ -47,7 +47,7 @@ const getAllSpecialtiesService = async (query: TSpecialtiesQuery) => {
     },
   }));
 
-  const pagination = calculatePagination({ page, limit, sortBy, sortOrder });
+  const pagination = calculatePaginationSorting({ page, limit, sortBy, sortOrder });
 
   if (query?.searchTerm) {
     conditions.OR = searchQuery;

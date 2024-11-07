@@ -6,10 +6,10 @@ import { TDoctor } from "../Doctor/doctor.interface";
 import { TPatient } from "../Patient/patient.interface";
 import { TUpdateProfile, TUserQuery } from "./user.interface";
 import { UserSearchableFields } from "./user.constant";
-import calculatePaginationSorting from "../../utils/calculatePaginationSorting";
 import ApiError from "../../errors/ApiError";
 import cloudinary from "../../helper/cloudinary";
 import findPublicId from "../../helper/findPublicId";
+import { calculatePaginationSorting } from "../../helper/QueryBuilder";
 
 const prisma = new PrismaClient();
 

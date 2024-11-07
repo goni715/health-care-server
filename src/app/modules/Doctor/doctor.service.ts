@@ -1,5 +1,5 @@
+import { calculatePaginationSorting } from "../../helper/QueryBuilder";
 import prisma from "../../shared/prisma";
-import calculatePaginationSorting from "../../utils/calculatePaginationSorting";
 import { DoctorSearchableFields } from "./doctor.constant";
 import { TDoctorQuery } from "./doctor.interface";
 
