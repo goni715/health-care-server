@@ -1,8 +1,9 @@
+import { NextFunction } from "express";
 import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
 import { DoctorValidFields } from "./doctor.constant";
-import { getAllDoctorsService } from "./doctor.service";
+import { deleteDoctorService, getAllDoctorsService, getSingleDoctorService } from "./doctor.service";
 
 
 const getAllDoctors = catchAsync(async (req, res) => {
@@ -18,6 +19,52 @@ const getAllDoctors = catchAsync(async (req, res) => {
 })
   
 
+
+const getSingleDoctor = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await getSingleDoctorService(id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Doctor is retrieved successfully",
+    data: result,
+  });
+});
+
+
+
+const deleteDoctor = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await deleteDoctorService(id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Doctor is deleted successfully",
+    data: result,
+  });
+
+})
+
+
+const softDeleteDoctor = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await deleteDoctorService(id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Doctor is deleted successfully",
+    data: result,
+  });
+})
+
+
+
 export const DoctorController = {
-    getAllDoctors
+    getAllDoctors,
+    getSingleDoctor,
+    deleteDoctor,
+    softDeleteDoctor
 }

@@ -1,3 +1,5 @@
+import { Doctor } from "@prisma/client";
+import ApiError from "../../errors/ApiError";
 import { calculatePaginationSorting } from "../../helper/QueryBuilder";
 import prisma from "../../shared/prisma";
 import { DoctorSearchableFields } from "./doctor.constant";
@@ -62,4 +64,105 @@ const getAllDoctorsService = async (query: TDoctorQuery) => {
   };
 };
 
-export { getAllDoctorsService };
+
+
+const getSingleDoctorService = async (id: string) => {
+  const result = await prisma.doctor.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+
+  if(!result){
+    throw new ApiError(404, "id does not exist");
+  }
+
+  return result;
+};
+
+const deleteDoctorService = async (id: string): Promise<Doctor> => {
+
+  const doctor = await prisma.doctor.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+
+  //if id is not exist
+  if(!doctor){
+    throw new ApiError(404, "id does not exist");
+  }
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    //query-01 doctor delete
+    const doctorDeletedData = await transactionClient.doctor.delete({
+      where: {
+        id,
+      },
+    });
+
+    //query-02 delete-user
+    await transactionClient.user.delete({
+      where: {
+        email: doctorDeletedData.email,
+      },
+    });
+
+    return doctorDeletedData;
+  });
+
+  return result;
+};
+
+
+
+
+const softDeleteDoctorService = async (id: string): Promise<Doctor> => {
+  //if id is not exist
+  const doctor = await prisma.admin.findUnique({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+
+  //if id is not exist
+  if(!doctor){
+    throw new ApiError(404, "id does not exist");
+  }
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    //query-01-dcotor-delete
+    const doctorDeletedData = await transactionClient.doctor.update({
+      where: {
+        id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    //query-02- delete-user
+    await transactionClient.user.update({
+      where: {
+        email: doctorDeletedData.email,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    return doctorDeletedData;
+  });
+
+  return result;
+};
+
+export {
+   getAllDoctorsService,
+   getSingleDoctorService,
+   deleteDoctorService,
+   softDeleteDoctorService
+};

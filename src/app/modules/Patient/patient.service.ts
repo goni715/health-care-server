@@ -37,7 +37,7 @@ const getAllPatientsService = async (query: TPatientQuery) => {
     },
   });
 
-  // Count total doctors matching the criteria
+  // Count total patients matching the criteria
   const total = await prisma.patient.count({
     where: whereConditions,
   });
