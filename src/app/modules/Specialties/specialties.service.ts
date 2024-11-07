@@ -1,8 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary";
-import { TSpecialties } from "./specialties.interface"
+import { TSpecialties, TSpecialtiesQuery } from "./specialties.interface"
+import calculatePagination from "../../utils/calculatePagination";
+import { SpecialtiesSearchableFields } from "./specialties.constant";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 const createSpecialtiesService = async(file: Express.Multer.File | undefined, payload: TSpecialties) => {
 
@@ -32,7 +34,53 @@ const createSpecialtiesService = async(file: Express.Multer.File | undefined, pa
 
 
 
+const getAllSpecialtiesService = async (query: TSpecialtiesQuery) => {
+  const { searchTerm, page, limit, sortBy, sortOrder, ...filterData } = query;
+  let conditions: Record<string, unknown> = {}
+  const searchQuery = SpecialtiesSearchableFields.map((item) => ({
+    [item]: {
+      contains: query?.searchTerm,
+      mode: "insensitive",
+    },
+  }));
+
+  const pagination = calculatePagination({ page, limit, sortBy, sortOrder });
+ 
+
+  if (query?.searchTerm) {
+    conditions.OR = searchQuery
+  }
+  
+
+  const result = await prisma.specialties.findMany({
+    skip: pagination.skip,
+    take: pagination.limit,
+    orderBy: {
+      [pagination.sortBy]: pagination.sortOrder,
+    },
+  });
+
+  const total = await prisma.specialties.count({
+    where: conditions
+  });
+
+
+
+
+  return {
+    meta: {
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: Math.ceil(total / pagination.limit),
+      total,
+    },
+    data: result,
+  };
+};
+
+
 
 export {
-    createSpecialtiesService
+    createSpecialtiesService,
+    getAllSpecialtiesService
 }
