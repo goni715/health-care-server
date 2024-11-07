@@ -3,7 +3,7 @@ import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
 import { DoctorValidFields } from "./doctor.constant";
-import { deleteDoctorService, getAllDoctorsService, getSingleDoctorService } from "./doctor.service";
+import { deleteDoctorService, getAllDoctorsService, getSingleDoctorService, softDeleteDoctorService, updateDoctorService } from "./doctor.service";
 
 
 const getAllDoctors = catchAsync(async (req, res) => {
@@ -50,7 +50,7 @@ const deleteDoctor = catchAsync(async (req, res) => {
 
 const softDeleteDoctor = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await deleteDoctorService(id);
+  const result = await softDeleteDoctorService(id);
 
   sendResponse(res, {
     statusCode: 200,
@@ -62,9 +62,24 @@ const softDeleteDoctor = catchAsync(async (req, res) => {
 
 
 
+const updateDoctor = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await updateDoctorService(id, req.body);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Doctor is updated successfully",
+    data: result,
+  });
+})
+
+
+
 export const DoctorController = {
     getAllDoctors,
     getSingleDoctor,
     deleteDoctor,
-    softDeleteDoctor
+    softDeleteDoctor,
+    updateDoctor
 }

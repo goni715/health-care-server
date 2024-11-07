@@ -3,7 +3,7 @@ import ApiError from "../../errors/ApiError";
 import { calculatePaginationSorting } from "../../helper/QueryBuilder";
 import prisma from "../../shared/prisma";
 import { DoctorSearchableFields } from "./doctor.constant";
-import { TDoctorQuery } from "./doctor.interface";
+import { TDoctorQuery, TUpdateDoctor } from "./doctor.interface";
 
 const getAllDoctorsService = async (query: TDoctorQuery) => {
   const { searchTerm, page, limit, sortBy, sortOrder, ...filters } = query;
@@ -121,7 +121,7 @@ const deleteDoctorService = async (id: string): Promise<Doctor> => {
 
 const softDeleteDoctorService = async (id: string): Promise<Doctor> => {
   //if id is not exist
-  const doctor = await prisma.admin.findUnique({
+  const doctor = await prisma.doctor.findUnique({
     where: {
       id,
       isDeleted: false,
@@ -160,9 +160,16 @@ const softDeleteDoctorService = async (id: string): Promise<Doctor> => {
   return result;
 };
 
+
+
+const updateDoctorService = async(id:string, payload: TUpdateDoctor) => {
+  return payload
+}
+
 export {
    getAllDoctorsService,
    getSingleDoctorService,
    deleteDoctorService,
-   softDeleteDoctorService
+   softDeleteDoctorService,
+   updateDoctorService
 };

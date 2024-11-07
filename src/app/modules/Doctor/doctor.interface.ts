@@ -18,6 +18,21 @@ export type TDoctor = {
 };
 
 
+export type TUpdateDoctor = {
+  name?: string;
+  contactNumber?: string;
+  address?: string;
+  registrationNumber?: string;
+  experience?: number;
+  gender?: "male" | "female";
+  appointmentFee?: number;
+  qualification?: string;
+  currentWorkingPlace?: string;
+  designation?: string;
+};
+
+
+
 
 export type TDoctorQuery = {
    searchTerm?: string;
