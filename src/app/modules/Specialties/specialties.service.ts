@@ -3,6 +3,7 @@ import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary";
 import { TSpecialties, TSpecialtiesQuery } from "./specialties.interface"
 import calculatePagination from "../../utils/calculatePagination";
 import { SpecialtiesSearchableFields } from "./specialties.constant";
+import ApiError from "../../errors/ApiError";
 
 const prisma = new PrismaClient();
 
@@ -79,8 +80,32 @@ const getAllSpecialtiesService = async (query: TSpecialtiesQuery) => {
 };
 
 
+const deleteSpecialtiesService = async (id: string) => {
+  //if id is not exist
+  const dataExist = await prisma.specialties.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  if (!dataExist) {
+    throw new ApiError(404, "This id does not exist");
+  }
+
+  //delete specialities
+  await prisma.specialties.delete({
+    where: {
+      id,
+    },
+  });
+
+  return null;
+};
+
+
 
 export {
     createSpecialtiesService,
-    getAllSpecialtiesService
+    getAllSpecialtiesService,
+    deleteSpecialtiesService
 }

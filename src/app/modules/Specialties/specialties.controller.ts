@@ -2,7 +2,7 @@ import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
 import { SpecialtiesValidFields } from "./specialties.constant";
-import { createSpecialtiesService, getAllSpecialtiesService } from "./specialties.service";
+import { createSpecialtiesService, deleteSpecialtiesService, getAllSpecialtiesService } from "./specialties.service";
 
 const createSpecialties = catchAsync(async (req, res) => {
     const result =  await createSpecialtiesService(req.file, req.body);
@@ -28,9 +28,24 @@ const createSpecialties = catchAsync(async (req, res) => {
     })
   })
   
+
+
+  const deleteSpecialties = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await deleteSpecialtiesService(id);
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Specialties deleted successfully",
+      data: result
+    })
+  })
+  
   
 
   export const SpecialtiesController = {
     createSpecialties,
-    getAllSpecialties
+    getAllSpecialties,
+    deleteSpecialties
   }
