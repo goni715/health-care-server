@@ -1,3 +1,4 @@
+
 export const DoctorSearchableFields = [
   "name",
   "email",
@@ -26,3 +27,5 @@ export const DoctorValidFields: string[] = [
   "currentWorkingPlace",
   "designation"
 ];
+
+

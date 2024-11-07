@@ -1,7 +1,6 @@
-import { calculatePaginationSorting } from "../../helper/QueryBuilder";
+import { calculatePaginationSorting, makeFilterQuery, makeSearchQuery } from "../../helper/QueryBuilder";
 import prisma from "../../shared/prisma";
-import { DoctorSearchableFields } from "./doctor.constant";
-import { TDoctorQuery } from "./doctor.interface";
+import { PatientSearchableFields } from "./patient.constant";
 import { TPatientQuery } from "./patient.interface";
 
 const getAllPatientsService = async (query: TPatientQuery) => {
@@ -10,22 +9,13 @@ const getAllPatientsService = async (query: TPatientQuery) => {
   // Search if searchTerm is exist
   let searchQuery;
   if (query?.searchTerm) {
-    searchQuery = DoctorSearchableFields.map((item) => ({
-      [item]: {
-        contains: query?.searchTerm,
-        mode: "insensitive",
-      },
-    }));
+    searchQuery = makeSearchQuery(PatientSearchableFields, query.searchTerm);
   }
 
   // Apply additional filters- filter-condition for specific field
   let filterQuery;
   if (Object.keys(filters).length > 0) {
-    filterQuery = Object.keys(filters).map((key) => ({
-      [key]: {
-        equals: (filters as any)[key],
-      },
-    }));
+    filterQuery = makeFilterQuery(filters);
   }
 
   // Build the 'where' clause based on search and filter
@@ -38,7 +28,7 @@ const getAllPatientsService = async (query: TPatientQuery) => {
   // Calculate pagination values & sorting
   const pagination = calculatePaginationSorting({ page, limit, sortBy, sortOrder });
 
-  const result = await prisma.doctor.findMany({
+  const result = await prisma.patient.findMany({
     where: whereConditions,
     skip: pagination.skip,
     take: pagination.limit,
@@ -48,7 +38,7 @@ const getAllPatientsService = async (query: TPatientQuery) => {
   });
 
   // Count total doctors matching the criteria
-  const total = await prisma.doctor.count({
+  const total = await prisma.patient.count({
     where: whereConditions,
   });
 
@@ -63,4 +53,4 @@ const getAllPatientsService = async (query: TPatientQuery) => {
   };
 };
 
-export { getAllDoctorsService };
+export { getAllPatientsService };
