@@ -1,15 +1,17 @@
 import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
+import { DoctorValidFields } from "./doctor.constant";
+import { getAllDoctorsService } from "./doctor.service";
 
 
 const getAllDoctors = catchAsync(async (req, res) => {
-    const validatedQuery = pickValidFields(req.query, AdminValidFields);
-    const result = await getAllAdminsService(validatedQuery);
+    const validatedQuery = pickValidFields(req.query, DoctorValidFields);
+    const result = await getAllDoctorsService(validatedQuery);
     sendResponse(res, {
       statusCode: 200,
       success: true,
-      message: "Admins are retrieved successfully",
+      message: "Doctors are retrieved successfully",
       meta: result.meta,
       data: result.data
     })

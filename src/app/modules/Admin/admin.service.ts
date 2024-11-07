@@ -1,6 +1,6 @@
 import { Admin, Prisma, PrismaClient } from "@prisma/client";
 import { AdminSearchableFields } from "./admin.constant";
-import calculatePagination from "../../utils/calculatePagination";
+import calculatePaginationSorting from "../../utils/calculatePaginationSorting";
 import { TAdminQuery } from "./admin.interface";
 
 const prisma = new PrismaClient();
@@ -16,7 +16,7 @@ const getAllAdminsService = async (query: TAdminQuery) => {
     },
   }));
 
-  const pagination = calculatePagination({ page, limit, sortBy, sortOrder });
+  const pagination = calculatePaginationSorting({ page, limit, sortBy, sortOrder });
 
   // [
   //     {
@@ -124,31 +124,34 @@ const getAllAdminsService = async (query: TAdminQuery) => {
     meta: {
       page: pagination.page,
       limit: pagination.limit,
-      totalPages : Math.ceil(total / pagination.limit),
+      totalPages: Math.ceil(total / pagination.limit),
       total,
     },
     data: result,
   };
 };
 
-const getSingleAdminService = async (id: string) : Promise<Admin | null> => {
+const getSingleAdminService = async (id: string): Promise<Admin | null> => {
   const result = await prisma.admin.findUnique({
     where: {
       id,
-      isDeleted: false
+      isDeleted: false,
     },
   });
 
   return result;
 };
 
-const updateAdminService = async (id: string, payload: Partial<Admin>) : Promise<Admin> => {
+const updateAdminService = async (
+  id: string,
+  payload: Partial<Admin>
+): Promise<Admin> => {
   //if id is not exist
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
-      isDeleted:false
-    }
+      isDeleted: false,
+    },
   });
 
   const result = await prisma.admin.update({
@@ -161,7 +164,7 @@ const updateAdminService = async (id: string, payload: Partial<Admin>) : Promise
   return result;
 };
 
-const deleteAdminService = async (id: string) : Promise<Admin> => {
+const deleteAdminService = async (id: string): Promise<Admin> => {
   //if id is not exist
   await prisma.admin.findUniqueOrThrow({
     where: {
@@ -195,7 +198,7 @@ const softDeleteAdminService = async (id: string): Promise<Admin> => {
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
-      isDeleted: false
+      isDeleted: false,
     },
   });
 

@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import uploadImageToCloudinary from "../../utils/uploadImageToCloudinary";
-import { TSpecialties, TSpecialtiesQuery } from "./specialties.interface"
-import calculatePagination from "../../utils/calculatePagination";
+import { TSpecialties, TSpecialtiesQuery } from "./specialties.interface";
+import calculatePagination from "../../utils/calculatePaginationSorting";
 import { SpecialtiesSearchableFields } from "./specialties.constant";
 import ApiError from "../../errors/ApiError";
 import findPublicId from "../../helper/findPublicId";
@@ -9,37 +9,37 @@ import cloudinary from "../../helper/cloudinary";
 
 const prisma = new PrismaClient();
 
-const createSpecialtiesService = async(file: Express.Multer.File | undefined, payload: TSpecialties) => {
+const createSpecialtiesService = async (
+  file: Express.Multer.File | undefined,
+  payload: TSpecialties
+) => {
+  const specialtiesExist = await prisma.specialties.findUnique({
+    where: {
+      title: payload.title,
+    },
+  });
 
-    const specialtiesExist = await prisma.specialties.findUnique({
-        where: {
-            title: payload.title
-        }
-    })
-    
-      //check email is already exist
-      if (specialtiesExist) {
-        throw new Error("This Title is already existed");
-      }
-    
-      //if there is a file -- upload image to cloudinary
-      if (file) {
-        const cloudinaryRes = await uploadImageToCloudinary(file?.path);
-        payload.icon = cloudinaryRes?.secure_url;
-      }
+  //check email is already exist
+  if (specialtiesExist) {
+    throw new Error("This Title is already existed");
+  }
 
-    const createdData = await prisma.specialties.create({
-        data: payload
-    })
+  //if there is a file -- upload image to cloudinary
+  if (file) {
+    const cloudinaryRes = await uploadImageToCloudinary(file?.path);
+    payload.icon = cloudinaryRes?.secure_url;
+  }
 
-    return createdData
-}
+  const createdData = await prisma.specialties.create({
+    data: payload,
+  });
 
-
+  return createdData;
+};
 
 const getAllSpecialtiesService = async (query: TSpecialtiesQuery) => {
   const { searchTerm, page, limit, sortBy, sortOrder, ...filterData } = query;
-  let conditions: Record<string, unknown> = {}
+  let conditions: Record<string, unknown> = {};
   const searchQuery = SpecialtiesSearchableFields.map((item) => ({
     [item]: {
       contains: query?.searchTerm,
@@ -48,12 +48,10 @@ const getAllSpecialtiesService = async (query: TSpecialtiesQuery) => {
   }));
 
   const pagination = calculatePagination({ page, limit, sortBy, sortOrder });
- 
 
   if (query?.searchTerm) {
-    conditions.OR = searchQuery
+    conditions.OR = searchQuery;
   }
-  
 
   const result = await prisma.specialties.findMany({
     skip: pagination.skip,
@@ -64,11 +62,8 @@ const getAllSpecialtiesService = async (query: TSpecialtiesQuery) => {
   });
 
   const total = await prisma.specialties.count({
-    where: conditions
+    where: conditions,
   });
-
-
-
 
   return {
     meta: {
@@ -80,7 +75,6 @@ const getAllSpecialtiesService = async (query: TSpecialtiesQuery) => {
     data: result,
   };
 };
-
 
 const deleteSpecialtiesService = async (id: string) => {
   //if id is not exist
@@ -104,8 +98,10 @@ const deleteSpecialtiesService = async (id: string) => {
   return null;
 };
 
-
-const updateIconService = async (file:Express.Multer.File | undefined, id: string) => {
+const updateIconService = async (
+  file: Express.Multer.File | undefined,
+  id: string
+) => {
   //check if the file is not exist
   if (!file) {
     throw new ApiError(400, "File is required");
@@ -122,39 +118,31 @@ const updateIconService = async (file:Express.Multer.File | undefined, id: strin
     throw new ApiError(404, "This id does not exist");
   }
 
- 
-
   //image upload to cloudinary
   const cloudinaryRes = await uploadImageToCloudinary(file?.path);
   const icon = cloudinaryRes?.secure_url;
 
-
-
   const updatedData = await prisma.specialties.update({
-      where: {
-        id
-      },
-      data: {
-        icon
-      }
-    });
-  
-
-
+    where: {
+      id,
+    },
+    data: {
+      icon,
+    },
+  });
 
   //delete image from cloudinary
-  if(dataExist.icon){
+  if (dataExist.icon) {
     const public_id = findPublicId(dataExist.icon);
     await cloudinary.uploader.destroy(public_id);
   }
- 
+
   return updatedData;
 };
 
-
 export {
-    createSpecialtiesService,
-    getAllSpecialtiesService,
-    deleteSpecialtiesService,
-    updateIconService
-}
+  createSpecialtiesService,
+  getAllSpecialtiesService,
+  deleteSpecialtiesService,
+  updateIconService,
+};

@@ -6,7 +6,7 @@ import { TDoctor } from "../Doctor/doctor.interface";
 import { TPatient } from "../Patient/patient.interface";
 import { TUpdateProfile, TUserQuery } from "./user.interface";
 import { UserSearchableFields } from "./user.constant";
-import calculatePagination from "../../utils/calculatePagination";
+import calculatePaginationSorting from "../../utils/calculatePaginationSorting";
 import ApiError from "../../errors/ApiError";
 import cloudinary from "../../helper/cloudinary";
 import findPublicId from "../../helper/findPublicId";
@@ -153,7 +153,7 @@ const getAllUsersService = async (query: TUserQuery) => {
     },
   }));
 
-  const pagination = calculatePagination({ page, limit, sortBy, sortOrder });
+  const pagination = calculatePaginationSorting({ page, limit, sortBy, sortOrder });
 
   if (query?.searchTerm) {
     andConditions.push({
@@ -244,10 +244,9 @@ const changeStatusService = async (
 };
 
 const getMyProfileService = async (email: string, role: UserRole) => {
-
   const user = await prisma.user.findUnique({
-    where :{
-      email
+    where: {
+      email,
     },
     select: {
       id: true,
@@ -259,8 +258,7 @@ const getMyProfileService = async (email: string, role: UserRole) => {
       createdAt: true,
       updatedAt: true,
     },
-  })
-
+  });
 
   let profileData;
 
@@ -273,8 +271,8 @@ const getMyProfileService = async (email: string, role: UserRole) => {
       select: {
         name: true,
         profilePhoto: true,
-        contactNumber:true
-     }
+        contactNumber: true,
+      },
     });
   }
 
@@ -309,22 +307,23 @@ const getMyProfileService = async (email: string, role: UserRole) => {
       select: {
         name: true,
         profilePhoto: true,
-        contactNumber:true,
-        address: true
-     }
+        contactNumber: true,
+        address: true,
+      },
     });
   }
 
-
-
   return {
     ...user,
-    ...profileData
+    ...profileData,
   };
 };
 
-const updateMyProfileService = async (email: string, role: UserRole, payload: TUpdateProfile) => {
-
+const updateMyProfileService = async (
+  email: string,
+  role: UserRole,
+  payload: TUpdateProfile
+) => {
   let profileData;
 
   //if role is admin
@@ -333,7 +332,7 @@ const updateMyProfileService = async (email: string, role: UserRole, payload: TU
       where: {
         email,
       },
-      data: payload.adminData
+      data: payload.adminData,
     });
   }
 
@@ -343,7 +342,7 @@ const updateMyProfileService = async (email: string, role: UserRole, payload: TU
       where: {
         email,
       },
-      data: payload.doctorData
+      data: payload.doctorData,
     });
   }
 
@@ -353,17 +352,18 @@ const updateMyProfileService = async (email: string, role: UserRole, payload: TU
       where: {
         email,
       },
-      data: payload.patientData
+      data: payload.patientData,
     });
   }
 
-
-   return profileData;
+  return profileData;
 };
 
-
-
-const updateMyProfilePhotoService = async (file:Express.Multer.File | undefined, email: string, role: UserRole) => {
+const updateMyProfilePhotoService = async (
+  file: Express.Multer.File | undefined,
+  email: string,
+  role: UserRole
+) => {
   //check if the file is not exist
   if (!file) {
     throw new ApiError(400, "File is required");
@@ -398,7 +398,7 @@ const updateMyProfilePhotoService = async (file:Express.Multer.File | undefined,
     });
   }
 
-  if(!profileData){
+  if (!profileData) {
     throw new ApiError(404, "User does not exist");
   }
 
@@ -415,8 +415,8 @@ const updateMyProfilePhotoService = async (file:Express.Multer.File | undefined,
         email,
       },
       data: {
-        profilePhoto
-      }
+        profilePhoto,
+      },
     });
   }
 
@@ -427,8 +427,8 @@ const updateMyProfilePhotoService = async (file:Express.Multer.File | undefined,
         email,
       },
       data: {
-        profilePhoto
-      }
+        profilePhoto,
+      },
     });
   }
 
@@ -439,21 +439,19 @@ const updateMyProfilePhotoService = async (file:Express.Multer.File | undefined,
         email,
       },
       data: {
-        profilePhoto
-      }
+        profilePhoto,
+      },
     });
   }
 
-
   //delete image from cloudinary
-  if(profileData.profilePhoto){
+  if (profileData.profilePhoto) {
     const public_id = findPublicId(profileData.profilePhoto);
     await cloudinary.uploader.destroy(public_id);
   }
- 
+
   return updatedData;
 };
-
 
 export {
   createAdminService,
@@ -463,5 +461,5 @@ export {
   changeStatusService,
   getMyProfileService,
   updateMyProfileService,
-  updateMyProfilePhotoService
+  updateMyProfilePhotoService,
 };

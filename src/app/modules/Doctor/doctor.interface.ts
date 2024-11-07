@@ -16,3 +16,18 @@ export type TDoctor = {
       designation: string;
    };
 };
+
+
+
+export type TDoctorQuery = {
+   searchTerm?: string;
+   page?: string;
+   limit?: string;
+   sortBy?: string;
+   sortOrder?: 'asc' | 'desc';
+   name?: string;
+   email?: string;
+   contactNumber?: string;
+ };
+ 
+ 
