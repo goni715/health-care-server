@@ -2,7 +2,7 @@ import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
 import { PatientValidFields } from "./patient.constant";
-import { getAllPatientsService } from "./patient.service";
+import { deletePatientService, getAllPatientsService, getSinglePatientService, softDeletePatientService } from "./patient.service";
 
 
 const getAllPatients = catchAsync(async (req, res) => {
@@ -18,6 +18,52 @@ const getAllPatients = catchAsync(async (req, res) => {
 })
   
 
+
+const getSinglePatient = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await getSinglePatientService(id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Patient is retrieved successfully",
+    data: result,
+  });
+});
+
+
+
+const deletePatient = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await deletePatientService(id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Patient is deleted successfully",
+    data: result,
+  });
+
+})
+
+
+const softDeletePatient = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await softDeletePatientService(id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Patient is deleted successfully.. soft",
+    data: result,
+  });
+})
+
+
+
 export const PatientController = {
-    getAllPatients
+    getAllPatients,
+    getSinglePatient,
+    deletePatient,
+    softDeletePatient
 }
