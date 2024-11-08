@@ -163,7 +163,34 @@ const softDeleteDoctorService = async (id: string): Promise<Doctor> => {
 
 
 const updateDoctorService = async(id:string, payload: TUpdateDoctor) => {
-  return payload
+  const { specialties, ...doctorData } = payload;
+
+  console.log("specialties", specialties);
+
+  const doctorExist = await prisma.doctor.findUnique({
+    where:{
+      id
+    }
+  })
+
+  //check id is not exist
+  if(!doctorExist){
+    throw new ApiError(404, 'Id does not exist')
+  }
+
+
+  const result = await prisma.doctor.update({
+    where: {
+      id
+    },
+    data: doctorData,
+    include: {
+      doctorSpecialties: true
+    }
+  })
+
+
+  return result;
 }
 
 export {

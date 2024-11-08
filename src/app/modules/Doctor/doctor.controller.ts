@@ -1,4 +1,3 @@
-import { NextFunction } from "express";
 import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
