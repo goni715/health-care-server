@@ -227,24 +227,21 @@ const updateDoctorService = async(id:string, payload: TUpdateDoctor) => {
         }));
 
         if(dataArr.length > 0){
-
           //check doctorId & specialtiesId already exist
           const createSpecialtiesIds = specialties.filter(item => !item.isDeleted).map(item => item.specialtiesId);
-          const check = await transactionClient.doctorSpecialties.findMany({
+          const doctorSpecialtiesExist = await transactionClient.doctorSpecialties.findMany({
                 where: {
                   doctorId: doctorExist.id,
                   specialtiesId: { in: createSpecialtiesIds } // Match any value in the array
                 }
           });
 
-          if(check.length>0){
-            throw new ApiError(409, 'doctorId & specialtiesId is already exist in DoctorSpecialties')
-          }
 
-          //create doctorSpecialties 
-          await transactionClient.doctorSpecialties.createMany({
-            data: dataArr
-          })
+          if (doctorSpecialtiesExist.length === 0) {
+            await transactionClient.doctorSpecialties.createMany({
+              data: dataArr,
+            });
+          }   
         }
         
 
