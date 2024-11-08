@@ -29,7 +29,7 @@ export type TUpdateDoctor = {
   qualification?: string;
   currentWorkingPlace?: string;
   designation?: string;
-  specialties: string[]
+  specialties: {specialtiesId: string, isDeleted: boolean}[]
 };
 
 

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { boolean, z } from "zod";
 import capitalizeValidator from "../../helper/capitalizeValidator";
 const MobileRegx = /(^(\+88|0088)?(01){1}[3456789]{1}(\d){8})$/;
 const NonWhiteSpaceRegex = /^\S*$/;
@@ -162,5 +162,10 @@ export const updateDoctorSchema = z.object({
     .min(1, { message: "Designation is required" })
     .trim()
     .optional(),
-    specialties: z.array(z.string())
+    specialties: z.array(
+      z.object({
+        specialtiesId: z.string(),
+        isDeleted: z.boolean()
+      })
+    ).default([])
 });

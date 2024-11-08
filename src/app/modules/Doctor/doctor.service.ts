@@ -176,48 +176,109 @@ const updateDoctorService = async(id:string, payload: TUpdateDoctor) => {
     throw new ApiError(404, "Id does not exist");
   }
 
+
   
   //transaction started
-  const result = await prisma.$transaction(async (transactionClient) => {
+  await prisma.$transaction(async (transactionClient) => {
     //query-01 update doctor
-    const updatedDocotor = await transactionClient.doctor.update({
+    await transactionClient.doctor.update({
       where: {
-        id,
+        id
       },
-      data: doctorData,
-      include: {
-        doctorSpecialties: true,
-      },
+      data: doctorData
     });
 
-    //query-02 crate doctor specialties
-    // for (const specialtiesId of specialties) {
-    //   const createDoctorSpecialties =
-    //     await transactionClient.doctorSpecialties.create({
-    //       data: {
-    //         doctorId: doctorExist.id,
-    //         specialtiesId: specialtiesId,
-    //       },
-    //     });
-    // }
+
+      if(specialties && specialties.length > 0){
+        const deleteSpecialtiesIds = specialties.filter(item => item.isDeleted).map(item => item.specialtiesId);
+        //query-02
+        //delete doctor specialties by specialties & doctor id
+        if(deleteSpecialtiesIds.length > 0){
+          for(const specialtiesId of deleteSpecialtiesIds){
+            await transactionClient.doctorSpecialties.deleteMany({
+              where: {
+                doctorId: doctorExist.id,
+                specialtiesId: specialtiesId
+              }
+            })
+          }  
+        }
+
+        //query-02
+        //second way for deleting multiple doctorSpecialties
+        // if (deleteSpecialtiesIds.length > 0) {
+        //   const deleteDoctorSpecialties = await transactionClient.doctorSpecialties.deleteMany({
+        //     where: {
+        //       doctorId: doctorExist.id,
+        //       specialtiesId: { in: deleteSpecialtiesIds } // Match any value in the array
+        //     }
+        //   });
+        // }
+        
 
 
-    //second-way query -02
-  const dataArr = specialties?.map((item) => ({
-    doctorId: doctorExist.id,
-    specialtiesId: item,
-  }));
-   
-   const createDoctorSpecialties = await transactionClient.doctorSpecialties.createMany({
-    data:dataArr
-   })
 
 
-    return updatedDocotor;
+        //query-03
+        //create doctorSpecialties using createMany method
+        const dataArr = specialties.filter(item => !item.isDeleted).map(item => ({
+          doctorId: doctorExist.id,
+          specialtiesId: item.specialtiesId,
+        }));
+
+        if(dataArr.length > 0){
+
+          //check doctorId & specialtiesId already exist
+          const createSpecialtiesIds = specialties.filter(item => !item.isDeleted).map(item => item.specialtiesId);
+          const check = await transactionClient.doctorSpecialties.findMany({
+                where: {
+                  doctorId: doctorExist.id,
+                  specialtiesId: { in: createSpecialtiesIds } // Match any value in the array
+                }
+          });
+
+          if(check.length>0){
+            throw new ApiError(409, 'doctorId & specialtiesId is already exist in DoctorSpecialties')
+          }
+
+          //create doctorSpecialties 
+          await transactionClient.doctorSpecialties.createMany({
+            data: dataArr
+          })
+        }
+        
+
+        // const dataArr = [
+        //   {
+        //     doctorId: '8937fdb8-f5d3-4c55-882d-72cccfc01b1c',
+        //     specialtiesId: '2d0e28f0-4d3f-4f70-a102-ed43a80612f5'
+        //   },
+        //   {
+        //     doctorId: '8937fdb8-f5d3-4c55-882d-72cccfc01b1c',
+        //     specialtiesId: '8ba8dd81-5661-4073-8342-deeefa2d2533'
+        //   }
+        // ]
+
+
+      }
+
 
 
 
   }); //transaction ended
+
+  const result = await prisma.doctor.findUnique({
+    where: {
+      id:doctorExist.id,
+    },
+    include: {
+      doctorSpecialties:{
+        include: {
+          specialties: true
+        }
+      }
+    }
+  });
 
   return result;
 }
