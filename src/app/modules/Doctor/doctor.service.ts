@@ -165,30 +165,59 @@ const softDeleteDoctorService = async (id: string): Promise<Doctor> => {
 const updateDoctorService = async(id:string, payload: TUpdateDoctor) => {
   const { specialties, ...doctorData } = payload;
 
-  console.log("specialties", specialties);
-
   const doctorExist = await prisma.doctor.findUnique({
-    where:{
-      id
-    }
-  })
+    where: {
+      id,
+    },
+  });
 
   //check id is not exist
-  if(!doctorExist){
-    throw new ApiError(404, 'Id does not exist')
+  if (!doctorExist) {
+    throw new ApiError(404, "Id does not exist");
   }
 
+  
+  //transaction started
+  const result = await prisma.$transaction(async (transactionClient) => {
+    //query-01 update doctor
+    const updatedDocotor = await transactionClient.doctor.update({
+      where: {
+        id,
+      },
+      data: doctorData,
+      include: {
+        doctorSpecialties: true,
+      },
+    });
 
-  const result = await prisma.doctor.update({
-    where: {
-      id
-    },
-    data: doctorData,
-    include: {
-      doctorSpecialties: true
-    }
-  })
+    //query-02 crate doctor specialties
+    // for (const specialtiesId of specialties) {
+    //   const createDoctorSpecialties =
+    //     await transactionClient.doctorSpecialties.create({
+    //       data: {
+    //         doctorId: doctorExist.id,
+    //         specialtiesId: specialtiesId,
+    //       },
+    //     });
+    // }
 
+
+    //second-way query -02
+  const dataArr = specialties?.map((item) => ({
+    doctorId: doctorExist.id,
+    specialtiesId: item,
+  }));
+   
+   const createDoctorSpecialties = await transactionClient.doctorSpecialties.createMany({
+    data:dataArr
+   })
+
+
+    return updatedDocotor;
+
+
+
+  }); //transaction ended
 
   return result;
 }

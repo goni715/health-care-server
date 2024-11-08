@@ -29,6 +29,7 @@ export type TUpdateDoctor = {
   qualification?: string;
   currentWorkingPlace?: string;
   designation?: string;
+  specialties: string[]
 };
 
 
