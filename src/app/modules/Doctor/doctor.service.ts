@@ -6,7 +6,7 @@ import { DoctorSearchableFields } from "./doctor.constant";
 import { TDoctorQuery, TUpdateDoctor } from "./doctor.interface";
 
 const getAllDoctorsService = async (query: TDoctorQuery) => {
-  const { searchTerm, page, limit, sortBy, sortOrder, ...filters } = query;
+  const { searchTerm, specialties, page, limit, sortBy, sortOrder, ...filters } = query;
 
   // Search if searchTerm is exist
   let searchQuery;
@@ -29,6 +29,48 @@ const getAllDoctorsService = async (query: TDoctorQuery) => {
     }));
   }
 
+
+
+ //filter relational field--
+ //filter sepcialties
+ if(filterQuery && specialties && specialties?.length >0){
+  filterQuery = [
+    ...filterQuery,
+    {
+      doctorSpecialties: {
+        some: {
+          specialties: {
+            title: {
+              contains: specialties,
+              mode: 'insensitive'
+            }
+          }
+        }
+      }
+    }
+  ]
+ }
+
+
+ if(!filterQuery && specialties && specialties?.length >0){
+  filterQuery = [
+    {
+      doctorSpecialties: {
+        some: {
+          specialties: {
+            title: {
+              contains: specialties,
+              mode: 'insensitive'
+            }
+          }
+        }
+      }
+    }
+  ]
+ }
+
+
+
   // Build the 'where' clause based on search and filter
   const whereConditions: any = {
     isDeleted: false,
@@ -46,6 +88,13 @@ const getAllDoctorsService = async (query: TDoctorQuery) => {
     orderBy: {
       [pagination.sortBy]: pagination.sortOrder,
     },
+    include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true
+        }
+      }
+    }
   });
 
   // Count total doctors matching the criteria
@@ -280,10 +329,28 @@ const updateDoctorService = async(id:string, payload: TUpdateDoctor) => {
   return result;
 }
 
+const filterDoctorBySpecialtiesService = async (specialtiesId: string) => {
+  const data = await prisma.doctorSpecialties.findMany({
+    where: {
+      specialtiesId
+    },
+    include:{
+      doctors:true
+    }
+  })
+
+  
+   const result = data?.map((item)=>item.doctors)
+  
+
+ return result;
+}
+
 export {
    getAllDoctorsService,
    getSingleDoctorService,
    deleteDoctorService,
    softDeleteDoctorService,
-   updateDoctorService
+   updateDoctorService,
+   filterDoctorBySpecialtiesService
 };

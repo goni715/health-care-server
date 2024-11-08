@@ -50,6 +50,7 @@ export type TDoctorQuery = {
    qualification?: string;
    currentWorkingPlace?: string;
    designation?: string;
+   specialties?: string;
  };
  
  

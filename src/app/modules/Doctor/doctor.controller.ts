@@ -2,7 +2,7 @@ import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
 import { DoctorValidFields } from "./doctor.constant";
-import { deleteDoctorService, getAllDoctorsService, getSingleDoctorService, softDeleteDoctorService, updateDoctorService } from "./doctor.service";
+import { deleteDoctorService, filterDoctorBySpecialtiesService, getAllDoctorsService, getSingleDoctorService, softDeleteDoctorService, updateDoctorService } from "./doctor.service";
 
 
 const getAllDoctors = catchAsync(async (req, res) => {
@@ -74,11 +74,24 @@ const updateDoctor = catchAsync(async (req, res) => {
 })
 
 
+const filterDoctorBySpecialties = catchAsync(async (req, res) => {
+  const { specialtiesId } = req.params;
+  const result = await filterDoctorBySpecialtiesService(specialtiesId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Doctors are retrieved successfully",
+    data: result,
+  });
+});
+
 
 export const DoctorController = {
     getAllDoctors,
     getSingleDoctor,
     deleteDoctor,
     softDeleteDoctor,
-    updateDoctor
+    updateDoctor,
+    filterDoctorBySpecialties
 }

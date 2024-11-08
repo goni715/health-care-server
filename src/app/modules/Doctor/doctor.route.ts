@@ -37,5 +37,10 @@ router.patch(
   DoctorController.updateDoctor
 );
 
+router.get(
+  "/filter-doctor-by-specialties/:specialtiesId",
+  AuthMiddleware("admin", "super_admin"),
+  DoctorController.filterDoctorBySpecialties
+);
 
 export const DoctorRoutes = router;

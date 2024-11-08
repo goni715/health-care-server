@@ -25,7 +25,8 @@ export const DoctorValidFields: string[] = [
   "appointmentFee",
   "qualification",
   "currentWorkingPlace",
-  "designation"
+  "designation",
+  "specialties"
 ];
 
 
