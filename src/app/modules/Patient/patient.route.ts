@@ -2,6 +2,8 @@ import express from 'express';
 import AuthMiddleware from '../../middlewares/AuthMiddleware';
 import { PatientController } from './patient.controller';
 import { UserRole } from '@prisma/client';
+import { updatePatientSchema } from './patient.validation';
+import validateRequest from '../../middlewares/validateRequest';
 
 
 const router = express.Router();
@@ -25,5 +27,11 @@ router.get(
     PatientController.softDeletePatient
   );
 
+  router.patch(
+    "/update-patient/:id",
+    AuthMiddleware(UserRole.admin, UserRole.super_admin, UserRole.doctor, UserRole.patient),
+     validateRequest(updatePatientSchema),
+    PatientController.updatePatient
+  );
 
 export const PatientRoutes = router;

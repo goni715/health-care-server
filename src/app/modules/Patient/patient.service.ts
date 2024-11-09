@@ -3,7 +3,7 @@ import ApiError from "../../errors/ApiError";
 import { calculatePaginationSorting, makeFilterQuery, makeSearchQuery } from "../../helper/QueryBuilder";
 import prisma from "../../shared/prisma";
 import { PatientSearchableFields } from "./patient.constant";
-import { TPatientQuery } from "./patient.interface";
+import { TPatientQuery, TUpdatePatient } from "./patient.interface";
 
 const getAllPatientsService = async (query: TPatientQuery) => {
   const { searchTerm, page, limit, sortBy, sortOrder, ...filters } = query;
@@ -158,9 +158,37 @@ const softDeletePatientService = async (id: string): Promise<Patient> => {
 };
 
 
+
+const updatePatientService = async(id:string, payload: TUpdatePatient) => {
+
+  const patientExist = await prisma.patient.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  //check id is not exist
+  if (!patientExist) {
+    throw new ApiError(404, "Id does not exist");
+  }
+
+   //update patient
+  const result = await prisma.patient.update({
+    where: {
+      id
+    },
+    data: payload
+  });
+
+
+  return result;
+}
+
+
 export {
    getAllPatientsService,
    getSinglePatientService,
    deletePatientService,
-   softDeletePatientService
+   softDeletePatientService,
+   updatePatientService
 };

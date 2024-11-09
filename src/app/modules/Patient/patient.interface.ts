@@ -9,6 +9,12 @@ export type TPatient = {
    };
 };
 
+export type TUpdatePatient = {
+   name?: string;
+   contactNumber?: string,
+   address?: string;
+}
+
 export type TPatientQuery = {
    searchTerm?: string;
    page?: string;

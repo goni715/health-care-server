@@ -121,19 +121,19 @@ model PatientHealthData {
   dateOfBirth DateTime
   gender Gender
   bloodGroup BloodGroup
-  hasAllergies Boolean
-  hasDiabetes Boolean
+  hasAllergies Boolean?
+  hasDiabetes Boolean?
   height String
   weight String
-  smokingStatus Boolean
-  dietaryPreferences String
-  pregnancyStatus Boolean
-  mentalHealthHistory String
-  immunizationStatus String
-  hasPastSurgeries Boolean
-  recentAnxiety Boolean
-  recentDepression Boolean
-  martialStatus MartialStatus 
+  smokingStatus Boolean?
+  dietaryPreferences String?
+  pregnancyStatus Boolean?
+  mentalHealthHistory String?
+  immunizationStatus String?
+  hasPastSurgeries Boolean?
+  recentAnxiety Boolean?
+  recentDepression Boolean?
+  martialStatus MartialStatus @default(UNMARRIED)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
