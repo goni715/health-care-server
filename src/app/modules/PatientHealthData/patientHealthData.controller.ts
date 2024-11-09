@@ -3,8 +3,7 @@ import sendResponse from "../../utils/sendResponse";
 import { createPatientHealthDataService } from "./patientHealthData.service";
 
 const createPatientHealthData = catchAsync(async (req, res) => {
-  const { patientId } = req.params;
-  const result = await createPatientHealthDataService(patientId, req.body);
+  const result = await createPatientHealthDataService(req.body);
   sendResponse(res, {
     statusCode: 201,
     success: true,

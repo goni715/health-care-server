@@ -1,14 +1,12 @@
-import { z } from "zod";
+import { nullable, z } from "zod";
 import { BloodGroup } from "./patientHealthData.constant";
 
 export const createPatientHealthDataSchema = z.object({
-  dateOfBirth: z.preprocess((arg) => {
-    if (typeof arg === "string" || arg instanceof Date) {
-      return new Date(arg);
-    }
-    return arg;
-  }, z.date()),
-  gender: z.enum(["MALE", "FEMALE"], {
+  patientId:z.string(),
+  dateOfBirth: z
+    .string()
+    .transform((val) => new Date(val)),
+  gender: z.enum(["male", "female"], {
     errorMap: () => ({ message: "{VALUE} is not supported" }),
   }),
   bloodGroup: z.enum([...BloodGroup] as [string, ...string[]], {
@@ -23,10 +21,10 @@ export const createPatientHealthDataSchema = z.object({
     required_error: "Weight is required",
   }),
   smokingStatus: z.boolean().nullable().optional(),
-  dietaryPreferences: z.string().nullable().optional(),
+  dietaryPreferences: z.boolean().nullable().optional(),
   pregnancyStatus: z.boolean().nullable().optional(),
-  mentalHealthHistory: z.string().nullable().optional(),
-  immunizationStatus: z.string().nullable().optional(),
+  mentalHealthHistory: z.boolean().nullable().optional(),
+  immunizationStatus: z.boolean().nullable().optional(),
   hasPastSurgeries: z.boolean().nullable().optional(),
   recentAnxiety: z.boolean().nullable().optional(),
   recentDepression: z.boolean().nullable().optional(),

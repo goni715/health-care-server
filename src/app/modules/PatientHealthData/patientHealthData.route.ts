@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 router.post(
-  "/create-patient-health-data/:patientId",
+  "/create-patient-health-data",
   AuthMiddleware("admin", "super_admin", 'doctor', 'patient'),
   validateRequest(createPatientHealthDataSchema),
   PatientHealthDataController.createPatientHealthData
