@@ -43,6 +43,36 @@ const createPatientHealthDataService = async(payload: PatientHealthData) => {
 }
 
 
+
+const updatePatientHealthDataService = async(patientId:string, payload: PatientHealthData) => {
+  
+    const patientExist = await prisma.patientHealthData.findUnique({
+        where: {
+            patientId: patientId
+        }
+    })
+  
+    //check id is not exist
+    if (!patientExist) {
+      throw new ApiError(404, "patientId does not exist");
+    }
+  
+     //update patientHealthData
+    const result = await prisma.patientHealthData.update({
+      where: {
+        patientId
+      },
+      data: payload
+    });
+  
+  
+    return result;
+  }
+  
+
+
+
 export {
-    createPatientHealthDataService
+    createPatientHealthDataService,
+    updatePatientHealthDataService
 }
