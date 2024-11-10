@@ -96,16 +96,32 @@ const deletePatientService = async (id: string): Promise<Patient> => {
     throw new ApiError(404, "id does not exist");
   }
 
-  const result = await prisma.$transaction(async (transactionClient) => {
-    //query-01 patient delete
-    const patientDeletedData = await transactionClient.patient.delete({
+  const result = await prisma.$transaction(async (tx) => {
+
+    //query-01 delete medicalReport
+    await tx.medicalReport.deleteMany({
       where: {
-        id,
+        patientId: patient.id
+      }
+    })
+
+     //query-02 delete patientHealthData
+     await tx.patientHealthData.delete({
+      where: {
+        patientId: patient.id
+      }
+    })
+
+
+    //query-03 patient delete
+    const patientDeletedData =await tx.patient.delete({
+      where: {
+        id
       },
     });
 
-    //query-02 delete-user
-    await transactionClient.user.delete({
+    //query-04 delete-user
+    await tx.user.delete({
       where: {
         email: patientDeletedData.email,
       },
