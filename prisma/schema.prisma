@@ -160,6 +160,8 @@ model Schedule {
   id String @id @default(uuid())
   startDate DateTime
   endDate DateTime
+  startTime String
+  endTime String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
