@@ -67,6 +67,10 @@ const getSinglePatientService = async (id: string) => {
       id,
       isDeleted: false,
     },
+    include: {
+      patientHealthData: true,
+      medicalReport: true
+    }
   });
 
   if(!result){
