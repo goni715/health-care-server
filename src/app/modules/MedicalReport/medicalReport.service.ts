@@ -14,7 +14,7 @@ const createMedicalReportService = async (payload: MedicalReport) => {
     
      //check patientId does not exist
      if(!patientExist){
-        throw new ApiError(409, 'patientId does not exist');
+        throw new ApiError(404, 'patientId does not exist');
     }
 
 
@@ -29,6 +29,50 @@ const createMedicalReportService = async (payload: MedicalReport) => {
 
 
 
+const deleteMedicalReportService = async (patientId: string, reportId: string) => {
+
+    const patient = await prisma.patient.findUnique({
+      where: {
+        id:patientId,
+        isDeleted: false,
+      },
+    });
+  
+    //if id is not exist
+    if(!patient){
+      throw new ApiError(404, "patientId does not exist");
+    }
+
+   
+    
+    const report = await prisma.medicalReport.findUnique({
+        where: {
+            id: reportId
+        },
+      });
+    
+      //if id is not exist
+      if(!report){
+        throw new ApiError(404, "reportId does not exist");
+      }
+  
+
+    const result = await prisma.medicalReport.delete({
+        where: {
+            id:reportId,
+            patientId
+        }
+    })
+
+    return result;
+    
+  };
+  
+  
+  
+
+
 export{
-    createMedicalReportService
+    createMedicalReportService,
+    deleteMedicalReportService
 }

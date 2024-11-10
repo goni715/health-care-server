@@ -18,7 +18,7 @@ const createPatientHealthDataService = async(payload: PatientHealthData) => {
     
      //check patientId does not exist
      if(!patientExist){
-        throw new ApiError(409, 'patientId does not exist');
+        throw new ApiError(404, 'patientId does not exist');
     }
 
 

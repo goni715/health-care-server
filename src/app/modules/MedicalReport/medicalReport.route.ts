@@ -14,6 +14,11 @@ router.post(
   MedicalReportController.createMedicalReport
 );
 
+router.delete(
+  "/delete-medical-report/:patientId/:reportId",
+  AuthMiddleware("admin", "super_admin", 'doctor'),
+  MedicalReportController.deleteMedicalReport
+);
 
 
 export const MedicalReportRoutes = router;
