@@ -1,0 +1,5 @@
+
+
+type TDoctorSchedule = {
+    schedules: string[]
+}
