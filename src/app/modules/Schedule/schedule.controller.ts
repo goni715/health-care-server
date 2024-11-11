@@ -4,7 +4,7 @@ import { createScheduleService, getAllSchedulesService } from "./schedule.servic
 
 
 const createSchedule = catchAsync(async (req, res) => {
-  const result = await createScheduleService(req.body);
+ const result = await createScheduleService(req.body);
   sendResponse(res, {
     statusCode: 201,
     success: true,
