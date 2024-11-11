@@ -16,7 +16,7 @@ router.post(
   ScheduleController.createSchedule
 );
 
-router.get('/get-all-schedules', AuthMiddleware("admin", 'super_admin'), ScheduleController.getAllSchedules);
+router.get('/get-all-schedules', AuthMiddleware('doctor'), ScheduleController.getAllSchedules);
 
 
 export const ScheduleRoutes = router;

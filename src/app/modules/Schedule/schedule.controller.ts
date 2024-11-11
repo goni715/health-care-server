@@ -17,8 +17,9 @@ const createSchedule = catchAsync(async (req, res) => {
 
 
 const getAllSchedules = catchAsync(async (req, res) => {
+  const { email } = req.headers;
   const validatedQuery = pickValidFields(req.query, ScheduleValidFields)
-  const result = await getAllSchedulesService(validatedQuery);
+  const result = await getAllSchedulesService(email as string, validatedQuery);
   sendResponse(res, {
     statusCode: 200,
     success: true,

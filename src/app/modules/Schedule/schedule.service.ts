@@ -83,33 +83,51 @@ const createScheduleService = async (payload: TSchedule) => {
 
 
 
-const getAllSchedulesService = async (query: TScheduleQuery) => {
-  const { page, limit, sortBy, sortOrder, ...filters } = query;
+const getAllSchedulesService = async (email:string, query: TScheduleQuery) => {
+  const { page, limit, sortBy, sortOrder, startDate, endDate, ...filters } = query;
 
 
   // Apply additional filters- filter-condition for specific field
   let filterQuery;
-  if (Object.keys(filters).length > 0) {
-    filterQuery = Object.keys(filters).map((key) => ({
-      [key]: {
-        equals: (filters as any)[key],
+  if (startDate && endDate) {
+    filterQuery = [
+      {
+        startDateTime: {
+          gte: startDate
+        }
       },
-    }));
+      {
+        endDateTime: {
+          lte: endDate
+        }
+      }
+    ]
   }
 
 
 
-
-  // Build the 'where' clause based on search and filter
-  const whereConditions: any = {
-    AND: filterQuery,
-  };
-
   // Calculate pagination values & sorting
   const pagination = calculatePaginationSorting({ page, limit, sortBy, sortOrder });
 
+
+  //doctor schedules for current doctor
+const doctorSchedules = await prisma.doctorSchedules.findMany({
+  where: {
+    doctor: {
+      email: email
+    }
+  }
+})
+
+ const doctorScheduleIds = doctorSchedules.map((item)=> item.scheduleId);
+
   const result = await prisma.schedule.findMany({
-    where: whereConditions,
+    where: {
+      AND: filterQuery,
+      id:{
+        notIn: doctorScheduleIds
+      }
+    },
     skip: pagination.skip,
     take: pagination.limit,
     orderBy: {
@@ -117,9 +135,17 @@ const getAllSchedulesService = async (query: TScheduleQuery) => {
     }
   });
 
-  // Count total doctors matching the criteria
+
+
+
+  // Count total with matching the criteria
   const total = await prisma.schedule.count({
-    where: whereConditions,
+    where: {
+      AND: filterQuery,
+      id:{
+        notIn: doctorScheduleIds
+      }
+    }
   });
 
   return {
@@ -131,7 +157,7 @@ const getAllSchedulesService = async (query: TScheduleQuery) => {
     },
     data: result,
   };
-  
+
 }
 
 
