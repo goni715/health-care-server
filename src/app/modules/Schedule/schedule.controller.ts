@@ -1,6 +1,6 @@
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-import { createScheduleService } from "./schedule.service";
+import { createScheduleService, getAllSchedulesService } from "./schedule.service";
 
 
 const createSchedule = catchAsync(async (req, res) => {
@@ -8,10 +8,22 @@ const createSchedule = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: "Schedule is created successfully",
+    message: "Schedules created successfully",
     data: result,
   });
 });
+
+
+const getAllSchedules = catchAsync(async (req, res) => {
+  //const result = await getAllSpecialtiesService(validatedQuery);
+  const result = await getAllSchedulesService();
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Schedules are retrieved successfully",
+    data: result
+  })
+})
 
 
 
@@ -19,5 +31,6 @@ const createSchedule = catchAsync(async (req, res) => {
 
 
 export const ScheduleController = {
-   createSchedule
+   createSchedule,
+   getAllSchedules
 }
