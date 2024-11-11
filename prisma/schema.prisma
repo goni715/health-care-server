@@ -158,10 +158,8 @@ model MedicalReport {
 
 model Schedule {
   id String @id @default(uuid())
-  startDate DateTime
-  endDate DateTime
-  startTime String
-  endTime String
+  startDateTime DateTime
+  endDateTime DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
