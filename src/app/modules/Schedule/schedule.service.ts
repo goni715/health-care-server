@@ -3,8 +3,9 @@ import {
   addDays,
   add,
 } from "date-fns";
-import { TSchedule } from "./schedule.interface";
+import { TSchedule, TScheduleQuery } from "./schedule.interface";
 import prisma from "../../shared/prisma";
+import { calculatePaginationSorting } from "../../helper/QueryBuilder";
 
 const createScheduleService = async (payload: TSchedule) => {
   const { startDate, endDate, startTime, endTime } = payload;
@@ -82,9 +83,55 @@ const createScheduleService = async (payload: TSchedule) => {
 
 
 
-const getAllSchedulesService = async () => {
-  const result = await prisma.schedule.findMany();
-  return result;
+const getAllSchedulesService = async (query: TScheduleQuery) => {
+  const { page, limit, sortBy, sortOrder, ...filters } = query;
+
+
+  // Apply additional filters- filter-condition for specific field
+  let filterQuery;
+  if (Object.keys(filters).length > 0) {
+    filterQuery = Object.keys(filters).map((key) => ({
+      [key]: {
+        equals: (filters as any)[key],
+      },
+    }));
+  }
+
+
+
+
+  // Build the 'where' clause based on search and filter
+  const whereConditions: any = {
+    AND: filterQuery,
+  };
+
+  // Calculate pagination values & sorting
+  const pagination = calculatePaginationSorting({ page, limit, sortBy, sortOrder });
+
+  const result = await prisma.schedule.findMany({
+    where: whereConditions,
+    skip: pagination.skip,
+    take: pagination.limit,
+    orderBy: {
+      [pagination.sortBy]: pagination.sortOrder,
+    }
+  });
+
+  // Count total doctors matching the criteria
+  const total = await prisma.schedule.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: Math.ceil(total / pagination.limit),
+      total,
+    },
+    data: result,
+  };
+  
 }
 
 

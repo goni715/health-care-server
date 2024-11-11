@@ -4,3 +4,13 @@ export type TSchedule = {
   startTime: string
   endTime: string
 };
+
+
+export type TScheduleQuery = {
+  page?: string;
+  limit?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  startDate?: string;
+  endDate?: string;
+};
