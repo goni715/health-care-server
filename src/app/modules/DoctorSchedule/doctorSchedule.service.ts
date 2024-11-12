@@ -1,7 +1,7 @@
 import ApiError from "../../errors/ApiError";
 import { calculatePaginationSorting } from "../../helper/QueryBuilder";
 import prisma from "../../shared/prisma";
-import { TDoctorScheduleQuery } from "./doctorSchedule.constant";
+import { TDoctorSchedule, TDoctorScheduleQuery } from "./doctorSchedule.interface";
 
 
 

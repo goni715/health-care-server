@@ -1,6 +1,7 @@
 import ApiError from "../../errors/ApiError";
+import { calculatePaginationSorting, makeFilterQuery } from "../../helper/QueryBuilder";
 import prisma from "../../shared/prisma";
-import { TAppointment } from "./appointment.interface";
+import { TAppointment, TAppointmentQuery } from "./appointment.interface";
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -91,6 +92,17 @@ const createAppointmentService = async (email: string, payload:TAppointment) => 
         }
     })
 
+
+
+    //query-03 create payment
+    await tx.payment.create({
+      data: {
+        appointmentId: createdAppointmentData.id,
+        amount: doctorExist.appointmentFee,
+        transactionId: 'ph-health-care-'+uuidv4()
+      }
+    })
+
     return createdAppointmentData;
 
   })
@@ -100,6 +112,118 @@ const createAppointmentService = async (email: string, payload:TAppointment) => 
 }
 
 
+const getMyAppointmentService = async (email:string, role: string, query: TAppointmentQuery) => {
+  const {
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+    ...filters
+  } = query;
+
+
+  
+  let filterQuery: any[] = [];
+  let includeFields;
+
+  //if role is doctor
+  if(role==="doctor"){
+    filterQuery.push({
+      doctor: {
+        email,
+      },
+    });
+
+    //set patient include fields
+    includeFields = {
+      patient: {
+        include: {
+          patientHealthData: true,
+          medicalReport: true,
+        },
+      },
+      schedule: true
+    };
+  }
+
+  //if role is patient
+  if(role==="patient"){
+    filterQuery.push({
+      patient: {
+        email
+      }
+    })
+
+   //set doctor include fields
+    includeFields = {
+      doctor: {
+        include: {
+          doctorSpecialties: {
+            include: {
+              specialties:true
+            }
+          }
+        }
+      },
+      schedule: true
+    }
+
+    
+  }
+
+
+
+   // Apply additional filters- filter-condition for specific field
+   if (Object.keys(filters).length > 0) {
+     filterQuery.push(...makeFilterQuery(filters)) 
+   }
+
+
+
+  // Build the 'where' clause based on search and filter
+  const whereConditions: any = {
+    AND: filterQuery,
+  };
+
+
+
+  // Calculate pagination values & sorting
+  const pagination = calculatePaginationSorting({
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+  });
+
+  const result = await prisma.appointment.findMany({
+    where: whereConditions,
+    skip: pagination.skip,
+    take: pagination.limit,
+    orderBy: {
+      [pagination.sortBy]: pagination.sortOrder,
+    },
+    include: includeFields
+  });
+
+  // Count total with matching the criteria
+  const total = await prisma.appointment.count({
+    where: whereConditions
+  });
+
+
+  return {
+    meta: {
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: Math.ceil(total / pagination.limit),
+      total
+    },
+    data: result,
+  };
+}
+
+
 export {
-    createAppointmentService
+    createAppointmentService,
+    getMyAppointmentService
 }

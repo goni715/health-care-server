@@ -17,4 +17,10 @@ router.post(
 );
 
 
+router.get(
+  "/get-my-appointments",
+  AuthMiddleware("doctor", "patient"),
+  AppointmentController.getMyAppointments
+);
+
 export const AppointmentRoutes = router;
