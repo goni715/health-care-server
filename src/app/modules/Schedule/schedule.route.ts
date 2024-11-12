@@ -17,6 +17,7 @@ router.post(
 );
 
 router.get('/get-all-schedules', AuthMiddleware('doctor'), ScheduleController.getAllSchedules);
+router.get('/get-single-schedule/:scheduleId', AuthMiddleware('admin', 'super_admin'), ScheduleController.getSingleSchedule);
 router.delete('/delete-schedule/:scheduleId', AuthMiddleware('admin', 'super_admin'), ScheduleController.deleteSchedule);
 
 

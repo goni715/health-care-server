@@ -162,6 +162,22 @@ const doctorSchedules = await prisma.doctorSchedules.findMany({
 }
 
 
+const getSingleScheduleService = async (scheduleId: string) => {
+  const result = await prisma.schedule.findUnique({
+    where: {
+      id: scheduleId,
+    },
+  });
+
+  if (!result) {
+    throw new ApiError(404, "This scheduleId does not exist");
+  }
+
+  return result;
+};
+
+
+
 const deleteScheduleService = async(scheduleId: string) => {
   const scheduleExist = await prisma.schedule.findUnique({
     where: {
@@ -193,10 +209,15 @@ const deleteScheduleService = async(scheduleId: string) => {
   })
 
 
-  return "result";
+  return result;
 
 }
 
 
 
-export { createScheduleService, getAllSchedulesService, deleteScheduleService};
+export { 
+  createScheduleService,
+  getAllSchedulesService,
+  getSingleScheduleService,
+  deleteScheduleService 
+};
