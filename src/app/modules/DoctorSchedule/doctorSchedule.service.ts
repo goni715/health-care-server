@@ -1,6 +1,7 @@
 import ApiError from "../../errors/ApiError";
 import { calculatePaginationSorting } from "../../helper/QueryBuilder";
 import prisma from "../../shared/prisma";
+import { TDoctorScheduleQuery } from "./doctorSchedule.constant";
 
 
 
@@ -52,98 +53,93 @@ const createDoctorScheduleService = async(email: string, payload: TDoctorSchedul
 }
 
 
-const getDoctorSchedulesService = async (email:string, query:any) => {
-    const { page, limit, sortBy, sortOrder, startDate, endDate, ...filters } = query;
-    console.log(email);
-  
-  
-    // Apply additional filters- filter-condition for specific field
-    let filterQuery;
-    if (startDate && endDate) {
-      filterQuery = [
-        {
-          startDateTime: {
-            gte: startDate
-          }
-        },
-        {
-          endDateTime: {
-            lte: endDate
-          }
-        }
-      ]
-    }
+const getDoctorSchedulesService = async (email:string, query:TDoctorScheduleQuery) => {
+  const {
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+    startDate,
+    endDate,
+    isBooked,
+    ...filters
+  } = query;
+
+  let filterQuery: any[] = [
+    {
+      doctor: {
+        email: email,
+      },
+    },
+  ];
+
+  if (startDate && endDate) {
+    filterQuery.push({
+      schedule: {
+        AND: [
+          {
+            startDateTime: {
+              gte: startDate,
+            },
+          },
+          {
+            endDateTime: {
+              lte: endDate,
+            },
+          },
+        ],
+      },
+    });
+  }
 
 
-      // Build the 'where' clause based on search and filter
+  if(isBooked){
+    filterQuery.push({
+      isBooked: isBooked ==="true" ? true : false
+    })
+  }
+
+
+  //console.dir(filterQuery, {depth: Infinity});
+
+
+  // Build the 'where' clause based on search and filter
   const whereConditions: any = {
     AND: filterQuery,
   };
-  
-  
-  
-    // Calculate pagination values & sorting
-    const pagination = calculatePaginationSorting({ page, limit, sortBy, sortOrder });
-  
-  
-  
-    const result = await prisma.doctorSchedules.findMany({
-      where: {
-        AND: [
-          // {
-          //   doctor : {
-          //     email: email
-          //   }
-          // },
-          // {
-          //   schedule: {
-          //     AND: [
-          //       {
-          //         startDateTime: {
-          //           gte: startDate
-          //         }
-          //       },
-          //       {
-          //         endDateTime: {
-          //           gte: endDate
-          //         }
-          //       }
-          //     ]
-          //   }
-          // }
-        ]
-      },
-      skip: pagination.skip,
-      take: pagination.limit,
-      // orderBy: {
-      //   [pagination.sortBy]: pagination.sortOrder,
-      // }
-    });
-  
-  
-  
-  
-    // Count total with matching the criteria
-    // const total = await prisma.schedule.count({
-    //   where: {
-    //     AND: filterQuery,
-    //     id:{
-    //       notIn: doctorScheduleIds
-    //     }
-    //   }
-    // });
-  
-    return {
-      meta: {
-        page: pagination.page,
-        limit: pagination.limit,
-        totalPages: Math.ceil(40 / pagination.limit),
-        total:40,
-      },
-      data: result,
-    };
-  
-  }
+
+  // Calculate pagination values & sorting
+  const pagination = calculatePaginationSorting({
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+  });
+
+  const result = await prisma.doctorSchedules.findMany({
+    where: whereConditions,
+    skip: pagination.skip,
+    take: pagination.limit,
+    include: {
+      schedule: true
+    }
+  });
+
+  // Count total with matching the criteria
+  const total = await prisma.doctorSchedules.count({
+    where: whereConditions
+  });
+
+  return {
+    meta: {
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: Math.ceil(total / pagination.limit),
+      total
+    },
+    data: result,
+  };
+}
   
   
 
