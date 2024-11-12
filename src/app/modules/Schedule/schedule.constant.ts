@@ -5,8 +5,6 @@
     "sortBy",
     "sortOrder",
     "startDate",
-    "endDate",
-    "contactNumber",
-    "address"
+    "endDate"
   ];
 

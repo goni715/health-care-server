@@ -14,5 +14,9 @@ router.post(
 );
 
 
+router.get('/get-doctor-schedules', AuthMiddleware('doctor'), DoctorScheduleController.getDoctorSchedules);
+
+
+
 
 export const DoctorScheduleRoutes = router;
