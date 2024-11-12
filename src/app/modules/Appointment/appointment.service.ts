@@ -222,8 +222,76 @@ const getMyAppointmentService = async (email:string, role: string, query: TAppoi
   };
 }
 
+const getAllAppointmentService = async (query: TAppointmentQuery) => {
+  const {
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+    ...filters
+  } = query;
+
+
+  
+  let filterQuery: any[] = [];
+
+
+   // Apply additional filters- filter-condition for specific field
+   if (Object.keys(filters).length > 0) {
+     filterQuery.push(...makeFilterQuery(filters)) 
+   }
+
+
+
+  // Build the 'where' clause based on search and filter
+  const whereConditions: any = {
+    AND: filterQuery,
+  };
+
+
+
+  // Calculate pagination values & sorting
+  const pagination = calculatePaginationSorting({
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+  });
+
+  const result = await prisma.appointment.findMany({
+    where: whereConditions,
+    skip: pagination.skip,
+    take: pagination.limit,
+    orderBy: {
+      [pagination.sortBy]: pagination.sortOrder,
+    },
+    include: {
+      patient: true,
+      doctor: true,
+      schedule: true
+    }
+  });
+
+  // Count total with matching the criteria
+  const total = await prisma.appointment.count({
+    where: whereConditions
+  });
+
+
+  return {
+    meta: {
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: Math.ceil(total / pagination.limit),
+      total
+    },
+    data: result,
+  };
+}
+
 
 export {
     createAppointmentService,
-    getMyAppointmentService
+    getMyAppointmentService,
+    getAllAppointmentService
 }

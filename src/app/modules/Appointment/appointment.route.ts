@@ -23,4 +23,10 @@ router.get(
   AppointmentController.getMyAppointments
 );
 
+router.get(
+  "/get-all-appointments",
+  AuthMiddleware("admin", "super_admin"),
+  AppointmentController.getAllAppointments
+);
+
 export const AppointmentRoutes = router;

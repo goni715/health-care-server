@@ -2,7 +2,7 @@ import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
 import { AppointmentValidFields } from "./appointment.constant";
-import { createAppointmentService, getMyAppointmentService } from "./appointment.service";
+import { createAppointmentService, getAllAppointmentService, getMyAppointmentService } from "./appointment.service";
 
 
 
@@ -36,7 +36,23 @@ const getMyAppointments = catchAsync(async (req, res) => {
 
 
 
+
+
+const getAllAppointments = catchAsync(async (req, res) => {
+  const validatedQuery = pickValidFields(req.query, AppointmentValidFields)
+  const result = await getAllAppointmentService(validatedQuery);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Appointments are retrieved successfully",
+    meta: result.meta,
+    data: result.data
+  })
+})
+
+
 export const AppointmentController = {
     createAppointment,
-    getMyAppointments
+    getMyAppointments,
+    getAllAppointments
 }
