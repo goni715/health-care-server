@@ -1,6 +1,7 @@
 import ApiError from "../../errors/ApiError";
 import prisma from "../../shared/prisma";
 import { TAppointment } from "./appointment.interface";
+import { v4 as uuidv4 } from 'uuid';
 
 
 const createAppointmentService = async (email: string, payload:TAppointment) => {
@@ -18,6 +19,9 @@ const createAppointmentService = async (email: string, payload:TAppointment) => 
   //set patientId
   payload.patientId= patientExist.id;
 
+  //set videoCalling
+  payload.videoCallingId=uuidv4();
+
 
 
   const doctorExist = await prisma.doctor.findUnique({
@@ -26,7 +30,7 @@ const createAppointmentService = async (email: string, payload:TAppointment) => 
     }
   });
 
-  //check if doctor does not exist
+ // check if doctor does not exist
   if (!doctorExist) {
     throw new ApiError(404, "doctorId does not exist");
   }
@@ -56,22 +60,11 @@ const createAppointmentService = async (email: string, payload:TAppointment) => 
 
   //check if doctorSchedule does not Exist
   if(!doctorScheduleExist){
-    throw new ApiError(404, "This scheduleId does not match with doctorId");
+    throw new ApiError(404, "DoctorSchedule does not exist by the combination of this scheduleId & doctorId");
   }
 
-
-  const isBookedSchedule = await prisma.doctorSchedules.findUnique({
-    where: {
-      doctorId_scheduleId: {
-        doctorId: payload.doctorId,
-        scheduleId: payload.scheduleId
-      },
-      isBooked: true
-    }
-   })
-
-
-   if(isBookedSchedule){
+   //check if doctorSchedule is already booked
+   if(doctorScheduleExist.isBooked){
     throw new ApiError(403, `This doctorSchedule is already booked`);
    }
 
@@ -98,7 +91,7 @@ const createAppointmentService = async (email: string, payload:TAppointment) => 
         }
     })
 
-    return createdAppointmentData
+    return createdAppointmentData;
 
   })
 

@@ -1,6 +1,6 @@
 
 export type TAppointment = {
-    patientId?: string;
+    patientId: string;
     doctorId: string,
     scheduleId: string,
     videoCallingId: string;

@@ -120,7 +120,8 @@ const getMySchedulesService = async (email:string, query:TDoctorScheduleQuery) =
     skip: pagination.skip,
     take: pagination.limit,
     include: {
-      schedule: true
+      schedule: true,
+      appointment: true
     }
   });
 
