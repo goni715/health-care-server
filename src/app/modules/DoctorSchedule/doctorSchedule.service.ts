@@ -202,7 +202,8 @@ const getAllDoctorSchedulesService = async (query:TDoctorScheduleQuery) => {
     skip: pagination.skip,
     take: pagination.limit,
     include: {
-      schedule: true
+      schedule: true,
+      doctor:true
     }
   });
 
