@@ -14,8 +14,9 @@ router.post(
 );
 
 
-router.get('/get-doctor-schedules', AuthMiddleware('doctor'), DoctorScheduleController.getDoctorSchedules);
+router.get('/get-my-schedules', AuthMiddleware('doctor'), DoctorScheduleController.getMySchedules);
 
+router.delete('/delete-my-schedule/:scheduleId', AuthMiddleware('doctor'), DoctorScheduleController.deleteMySchedule);
 
 
 

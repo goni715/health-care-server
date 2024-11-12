@@ -2,7 +2,7 @@ import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
 import { DoctorScheduleValidFields } from "./doctorSchedule.constant";
-import { createDoctorScheduleService, getDoctorSchedulesService } from "./doctorSchedule.service";
+import { createDoctorScheduleService, deleteMyScheduleService, getMySchedulesService } from "./doctorSchedule.service";
 
 
 const createDoctorSchedule = catchAsync(async (req, res) => {
@@ -19,10 +19,10 @@ const createDoctorSchedule = catchAsync(async (req, res) => {
 
 
 
-const getDoctorSchedules = catchAsync(async (req, res) => {
+const getMySchedules = catchAsync(async (req, res) => {
   const { email } = req.headers;
   const validatedQuery = pickValidFields(req.query, DoctorScheduleValidFields)
-  const result = await getDoctorSchedulesService(email as string, validatedQuery);
+  const result = await getMySchedulesService(email as string, validatedQuery);
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -34,7 +34,24 @@ const getDoctorSchedules = catchAsync(async (req, res) => {
 
 
 
+
+const deleteMySchedule = catchAsync(async (req, res) => {
+  const { email } = req.headers;
+  const { scheduleId } = req.params;
+  const result = await deleteMyScheduleService(email as string, scheduleId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "My schedule deleted successfully",
+    data: result,
+  });
+
+})
+
+
 export const DoctorScheduleController = {
   createDoctorSchedule,
-  getDoctorSchedules
+  getMySchedules,
+  deleteMySchedule
 }

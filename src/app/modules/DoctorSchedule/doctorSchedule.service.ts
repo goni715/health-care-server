@@ -53,7 +53,7 @@ const createDoctorScheduleService = async(email: string, payload: TDoctorSchedul
 }
 
 
-const getDoctorSchedulesService = async (email:string, query:TDoctorScheduleQuery) => {
+const getMySchedulesService = async (email:string, query:TDoctorScheduleQuery) => {
   const {
     page,
     limit,
@@ -141,10 +141,50 @@ const getDoctorSchedulesService = async (email:string, query:TDoctorScheduleQuer
   };
 }
   
-  
+const deleteMyScheduleService = async (email: string, scheduleId: string) => {
+  const doctorExist = await prisma.doctor.findUnique({
+    where: {
+      email
+    },
+  });
+
+   //check if doctorId does not exist
+   if(!doctorExist) {
+    throw new ApiError(404, "doctorId does not exist");
+   }
+
+   const isBookedSchedule = await prisma.doctorSchedules.findUnique({
+    where: {
+      doctorId_scheduleId: {
+        doctorId: doctorExist?.id,
+        scheduleId: scheduleId
+      },
+      isBooked: true
+    }
+   })
+
+
+   if(isBookedSchedule){
+    throw new ApiError(403, 'Failled to delete, This schedule is already booked');
+   }
+
+
+  const result = await prisma.doctorSchedules.delete({
+    where: {
+      doctorId_scheduleId: {
+        doctorId: doctorExist?.id,
+        scheduleId: scheduleId
+      }
+    } 
+  })
+
+
+  return result;
+}
 
 
 export {
     createDoctorScheduleService,
-    getDoctorSchedulesService
+    getMySchedulesService,
+    deleteMyScheduleService
 }

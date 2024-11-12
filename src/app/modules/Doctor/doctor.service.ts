@@ -20,7 +20,7 @@ const getAllDoctorsService = async (query: TDoctorQuery) => {
   }
 
   // Apply additional filters- filter-condition for specific field
-  let filterQuery;
+  let filterQuery: any[] = [];
   if (Object.keys(filters).length > 0) {
     filterQuery = Object.keys(filters).map((key) => ({
       [key]: {
@@ -33,7 +33,7 @@ const getAllDoctorsService = async (query: TDoctorQuery) => {
 
  //filter relational field--
  //filter sepcialties
- if(filterQuery && specialties && specialties?.length >0){
+ if(specialties && specialties?.length >0){
   filterQuery = [
     ...filterQuery,
     {
@@ -50,25 +50,6 @@ const getAllDoctorsService = async (query: TDoctorQuery) => {
     }
   ]
  }
-
-
- if(!filterQuery && specialties && specialties?.length >0){
-  filterQuery = [
-    {
-      doctorSpecialties: {
-        some: {
-          specialties: {
-            title: {
-              contains: specialties,
-              mode: 'insensitive'
-            }
-          }
-        }
-      }
-    }
-  ]
- }
-
 
 
   // Build the 'where' clause based on search and filter
