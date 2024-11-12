@@ -6,6 +6,7 @@ import {
 import { TSchedule, TScheduleQuery } from "./schedule.interface";
 import prisma from "../../shared/prisma";
 import { calculatePaginationSorting } from "../../helper/QueryBuilder";
+import ApiError from "../../errors/ApiError";
 
 const createScheduleService = async (payload: TSchedule) => {
   const { startDate, endDate, startTime, endTime } = payload;
@@ -161,6 +162,41 @@ const doctorSchedules = await prisma.doctorSchedules.findMany({
 }
 
 
+const deleteScheduleService = async(scheduleId: string) => {
+  const scheduleExist = await prisma.schedule.findUnique({
+    where: {
+      id: scheduleId
+    }
+  });
+
+  if(!scheduleExist){
+    throw new ApiError(404, 'scheduleId does not exist')
+  }
 
 
-export { createScheduleService, getAllSchedulesService };
+  const doctorScedules = await prisma.doctorSchedules.findMany({
+    where: {
+      scheduleId
+    }
+  })
+
+  if(doctorScedules.length > 0){
+    throw new ApiError(409, 'This scheduleId is associated with doctorSchedule');
+  }
+
+
+
+  const result = await prisma.schedule.delete({
+    where: {
+      id: scheduleId
+    }
+  })
+
+
+  return "result";
+
+}
+
+
+
+export { createScheduleService, getAllSchedulesService, deleteScheduleService};

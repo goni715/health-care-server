@@ -2,7 +2,7 @@ import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
 import { ScheduleValidFields } from "./schedule.constant";
-import { createScheduleService, getAllSchedulesService } from "./schedule.service";
+import { createScheduleService, deleteScheduleService, getAllSchedulesService } from "./schedule.service";
 
 
 const createSchedule = catchAsync(async (req, res) => {
@@ -31,10 +31,23 @@ const getAllSchedules = catchAsync(async (req, res) => {
 
 
 
+const deleteSchedule = catchAsync(async (req, res) => {
+  const { scheduleId } = req.params;
+  const result = await deleteScheduleService(scheduleId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Schedule is deleted successfully",
+    data: result,
+  });
+
+})
 
 
 
 export const ScheduleController = {
    createSchedule,
-   getAllSchedules
+   getAllSchedules,
+   deleteSchedule
 }
