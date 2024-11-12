@@ -52,7 +52,6 @@ const createDoctorScheduleService = async(email: string, payload: TDoctorSchedul
     return result;
 }
 
-
 const getMySchedulesService = async (email:string, query:TDoctorScheduleQuery) => {
   const {
     page,
@@ -72,6 +71,88 @@ const getMySchedulesService = async (email:string, query:TDoctorScheduleQuery) =
       },
     },
   ];
+
+  if (startDate && endDate) {
+    filterQuery.push({
+      schedule: {
+        AND: [
+          {
+            startDateTime: {
+              gte: startDate,
+            },
+          },
+          {
+            endDateTime: {
+              lte: endDate,
+            },
+          },
+        ],
+      },
+    });
+  }
+
+
+  if(isBooked){
+    filterQuery.push({
+      isBooked: isBooked ==="true" ? true : false
+    })
+  }
+
+
+  //console.dir(filterQuery, {depth: Infinity});
+
+
+  // Build the 'where' clause based on search and filter
+  const whereConditions: any = {
+    AND: filterQuery,
+  };
+
+  // Calculate pagination values & sorting
+  const pagination = calculatePaginationSorting({
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+  });
+
+  const result = await prisma.doctorSchedules.findMany({
+    where: whereConditions,
+    skip: pagination.skip,
+    take: pagination.limit,
+    include: {
+      schedule: true
+    }
+  });
+
+  // Count total with matching the criteria
+  const total = await prisma.doctorSchedules.count({
+    where: whereConditions
+  });
+
+  return {
+    meta: {
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: Math.ceil(total / pagination.limit),
+      total
+    },
+    data: result,
+  };
+}
+
+const getAllDoctorSchedulesService = async (query:TDoctorScheduleQuery) => {
+  const {
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+    startDate,
+    endDate,
+    isBooked,
+    ...filters
+  } = query;
+
+  let filterQuery: any[] = [];
 
   if (startDate && endDate) {
     filterQuery.push({
@@ -186,5 +267,6 @@ const deleteMyScheduleService = async (email: string, scheduleId: string) => {
 export {
     createDoctorScheduleService,
     getMySchedulesService,
+    getAllDoctorSchedulesService,
     deleteMyScheduleService
 }

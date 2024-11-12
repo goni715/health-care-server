@@ -2,7 +2,7 @@ import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
 import { DoctorScheduleValidFields } from "./doctorSchedule.constant";
-import { createDoctorScheduleService, deleteMyScheduleService, getMySchedulesService } from "./doctorSchedule.service";
+import { createDoctorScheduleService, deleteMyScheduleService, getAllDoctorSchedulesService, getMySchedulesService } from "./doctorSchedule.service";
 
 
 const createDoctorSchedule = catchAsync(async (req, res) => {
@@ -26,11 +26,25 @@ const getMySchedules = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
+    message: "My Schedules are retrieved successfully",
+    meta: result.meta,
+    data: result.data
+  })
+})
+
+
+const getAllDoctorSchedules = catchAsync(async (req, res) => {
+  const validatedQuery = pickValidFields(req.query, DoctorScheduleValidFields)
+  const result = await getAllDoctorSchedulesService(validatedQuery);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
     message: "Doctor Schedules are retrieved successfully",
     meta: result.meta,
     data: result.data
   })
 })
+
 
 
 
@@ -53,5 +67,6 @@ const deleteMySchedule = catchAsync(async (req, res) => {
 export const DoctorScheduleController = {
   createDoctorSchedule,
   getMySchedules,
+  getAllDoctorSchedules,
   deleteMySchedule
 }
