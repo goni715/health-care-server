@@ -8,12 +8,11 @@ const router = express.Router();
 
 
 router.post(
-  "/init-payment",
+  "/init-payment/:appointmentId",
   AuthMiddleware("patient"),
   PaymentController.initPaymentt
-
 );
 
-
+router.get("/success/:appointmentId", PaymentController.PaymentSuccess);
 
 export const PaymentRoutes = router;

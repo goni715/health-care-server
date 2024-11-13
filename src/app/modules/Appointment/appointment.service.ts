@@ -99,7 +99,7 @@ const createAppointmentService = async (email: string, payload:TAppointment) => 
       data: {
         appointmentId: createdAppointmentData.id,
         amount: doctorExist.appointmentFee,
-        transactionId: 'ph-health-care-'+uuidv4()
+        transactionId: uuidv4()
       }
     })
 
