@@ -31,7 +31,7 @@ router.get(
 
 router.patch(
   "/change-appointment-status/:id",
-  AuthMiddleware("admin", "super_admin"),
+  AuthMiddleware("admin", "super_admin", "doctor"),
   validateRequest(changeAppointmentStatusSchema),
   AppointmentController.changeAppointmentStatus
 );

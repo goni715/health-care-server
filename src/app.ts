@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import router from "./app/routes";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import notFound from "./app/middlewares/notFound";
+import { cancelUnpaidAppointmentService } from "./app/modules/Appointment/appointment.service";
 
 const app: Application = express();
 
@@ -19,6 +20,8 @@ app.use(morgan("dev"));
 //RequestBodySizeIncrease//Body Parser Implementation
 app.use(bodyParser.json({limit: '30mb'}));
 app.use(bodyParser.urlencoded({limit: '30mb', extended: true}));
+
+cancelUnpaidAppointmentService();
 
 //testing route
 app.get("/", (req: Request, res: Response) => {

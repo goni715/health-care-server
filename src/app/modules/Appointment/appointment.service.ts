@@ -1,5 +1,6 @@
 import ApiError from "../../errors/ApiError";
 import { calculatePaginationSorting, makeFilterQuery } from "../../helper/QueryBuilder";
+import { IAuthUser } from "../../interfaces/common.interface";
 import prisma from "../../shared/prisma";
 import { TAppointment, TAppointmentQuery, TUpdateStatus } from "./appointment.interface";
 import { v4 as uuidv4 } from 'uuid';
@@ -290,26 +291,59 @@ const getAllAppointmentService = async (query: TAppointmentQuery) => {
 }
 
 
-const changeAppointmentStatusService = async (appointmentId:string, payload: TUpdateStatus) => {
+const changeAppointmentStatusService = async (appointmentId:string, payload: TUpdateStatus, user: IAuthUser) => {
   const appointmentExist = await prisma.appointment.findUnique({
     where: {
       id:appointmentId
+    },
+    include: {
+      doctor: true
     }
   });
+
+  console.log(appointmentExist);
 
   //check if appointment does not exist
   if (!appointmentExist) {
     throw new ApiError(404, "appointmentId does not exist");
   }
 
+
+
+  //if user role is doctor
+  if(user?.role === "doctor"){
+    if(appointmentExist.doctor.email !== user?.email){
+      throw new ApiError(400, 'This is not your appointment')
+    }
+  }
+
+
   const result = await prisma.appointment.update({
+      where: {
+        id: appointmentId,
+      },
+      data: payload,
+    });
+
+
+  return result;
+
+}
+
+const cancelUnpaidAppointmentService = async ()=> {
+  console.log('cancel');
+  const thirtyMinutesAgo = new Date(Date.now()- 2*60*1000); //2 minutes ago
+  const unpaidAppointments = await prisma.appointment.findMany({
     where: {
-      id: appointmentId
-    },
-    data: payload
+      createdAt: {
+        lte: thirtyMinutesAgo
+      },
+      paymentStatus: 'UNPAID'
+    }
   })
 
-  return result
+  const unpaidAppointmentIds = unpaidAppointments?.map((item)=>item.id);
+  console.log(unpaidAppointmentIds);
 
 }
 
@@ -318,5 +352,6 @@ export {
     createAppointmentService,
     getMyAppointmentService,
     getAllAppointmentService,
-    changeAppointmentStatusService
+    changeAppointmentStatusService,
+    cancelUnpaidAppointmentService
 }

@@ -1,3 +1,5 @@
+import { Request } from "express";
+import { IAuthUser } from "../../interfaces/common.interface";
 import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
@@ -51,9 +53,10 @@ const getAllAppointments = catchAsync(async (req, res) => {
 })
 
 
-const changeAppointmentStatus = catchAsync(async (req, res) => {
+const changeAppointmentStatus = catchAsync(async (req: Request & { user?: IAuthUser }, res) => {
   const { id } = req.params;
-  const result = await changeAppointmentStatusService(id, req.body);
+  const user = req.user;
+  const result = await changeAppointmentStatusService(id, req.body, user as IAuthUser);
   sendResponse(res, {
     statusCode: 200,
     success: true,
