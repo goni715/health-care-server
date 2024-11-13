@@ -10,9 +10,9 @@ const router = express.Router();
 router.post(
   "/init-payment/:appointmentId",
   AuthMiddleware("patient"),
-  PaymentController.initPaymentt
+  PaymentController.initPayment
 );
 
-router.get("/success/:appointmentId", PaymentController.PaymentSuccess);
+router.post("/success/:appointmentId", PaymentController.paymentSuccess);
 
 export const PaymentRoutes = router;

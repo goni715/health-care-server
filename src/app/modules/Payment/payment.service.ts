@@ -31,7 +31,7 @@ const initPaymentService = async (appointmentId: string) => {
         total_amount: paymentData.amount,
         currency: 'BDT',
         tran_id: paymentData.transactionId, // use unique tran_id for each api call
-        success_url: config.success_url,
+        success_url: config.success_url+appointmentId,
         fail_url: config.fail_url,
         cancel_url: config.cancel_url,
         ipn_url: 'http://localhost:3030/ipn',//optional
@@ -81,7 +81,52 @@ const initPaymentService = async (appointmentId: string) => {
 }
 
 
+const paymentSuccessService = async (appointmentId: string) => {
+    const apppointmentExist = await prisma.appointment.findUnique({
+        where: {
+            id: appointmentId
+        }
+    })
+
+
+  //check if appointment does not exist
+  if (!apppointmentExist) {
+    throw new ApiError(404, "appointmentId does not exist");
+  }
+
+
+  const result = await prisma.$transaction(async (tx) => {
+    //query-01 update appointment
+    await tx.appointment.update({
+       where:{
+        id: appointmentId
+       },
+       data: {
+        paymentStatus: 'PAID'
+       }
+    })
+
+    //query-02 update payment
+    const updatedPayment = await tx.payment.update({
+        where:{
+          appointmentId: appointmentId
+        },
+        data: {
+         status: 'PAID'
+        }
+     })
+
+     return updatedPayment;
+
+
+  })
+
+   
+    return result;
+}
+
 
 export {
-    initPaymentService
+    initPaymentService,
+    paymentSuccessService
 }
