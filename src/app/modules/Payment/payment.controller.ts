@@ -28,8 +28,8 @@ const validatePayment = catchAsync(async (req, res) => {
 
 
 const paymentSuccess = catchAsync(async (req, res) => {
-  const { appointmentId } = req.params;
-  const result = await paymentSuccessService(appointmentId);
+  const { transactionId } = req.params;
+  const result = await paymentSuccessService(transactionId);
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -41,8 +41,40 @@ const paymentSuccess = catchAsync(async (req, res) => {
 
 
 
+
+const paymentFail = catchAsync(async (req, res) => {
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Payment Failled",
+    data: {
+      message: 'Ooops.. Failled to payment'
+    }
+  });
+
+  //res.redirect("https://mern-ecommerce-goni.netlify.app/#/payment/fail/"+req.params.tranId);
+});
+
+
+
+
+const paymentCancel = catchAsync(async (req, res) => {
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Payment Canceled Successfully",
+    data: {
+      message: 'Payment cancelled'
+    }
+  });
+});
+
+
+
 export const PaymentController = {
     initPayment,
     validatePayment,
-    paymentSuccess
+    paymentSuccess,
+    paymentFail,
+    paymentCancel
 }

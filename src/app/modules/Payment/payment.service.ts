@@ -2,6 +2,7 @@ import axios from "axios";
 import config from "../../config";
 import prisma from "../../shared/prisma";
 import ApiError from "../../errors/ApiError";
+import { PaymentStatus } from "@prisma/client";
 
 
 const initPaymentService = async (appointmentId: string) => {
@@ -31,7 +32,7 @@ const initPaymentService = async (appointmentId: string) => {
         total_amount: paymentData.amount,
         currency: 'BDT',
         tran_id: paymentData.transactionId, // use unique tran_id for each api call
-        success_url: config.success_url+appointmentId,
+        success_url: config.success_url+paymentData.transactionId,
         fail_url: config.fail_url,
         cancel_url: config.cancel_url,
         ipn_url: 'http://localhost:3030/ipn',//optional
@@ -81,6 +82,7 @@ const initPaymentService = async (appointmentId: string) => {
 }
 
 
+//sslcommerz ipn listener query
 // amount=1150.00&bank_tran_id=151114130739MqCBNx5&card_brand=VISA&card_issuer=BRAC+BANK%2C+LTD.&card_issuer_country=Bangladesh&card_issuer_country_code=BD&card_no=432149XXXXXX0667&card_type=VISA-Brac+bank¤cy=BDT&status=VALID&store_amount=1104.00&store_id=progr6733a65cce84c&tran_date=2015-11-14+13%3A07%3A12&tran_id=5646dd9d4b484&val_id=151114130742Bj94IBUk4uE5GRj&verify_sign=01120da945a35710e8d21cc0333f6976&verify_key=amount%2Cbank_tran_id%2Ccard_brand%2Ccard_issuer%2Ccard_issuer_country%2Ccard_issuer_country_code%2Ccard_no%2Ccard_type%2Ccurrency%2Cstatus%2Cstore_amount%2Cstore_id%2Ctran_date%2Ctran_id%2Cval_id
 
 const validatePaymentService = async (query:any) => {
@@ -136,45 +138,32 @@ const validatePaymentService = async (query:any) => {
 
 
 
-const paymentSuccessService = async (appointmentId: string) => {
-    const apppointmentExist = await prisma.appointment.findUnique({
-        where: {
-            id: appointmentId
-        }
-    })
-
-
-  //check if appointment does not exist
-  if (!apppointmentExist) {
-    throw new ApiError(404, "appointmentId does not exist");
-  }
-
+const paymentSuccessService = async (transactionId: string) => {
 
   const result = await prisma.$transaction(async (tx) => {
+    //query-01 update payment
+    const updatedPayment = await tx.payment.update({
+      where: {
+        transactionId: transactionId 
+      },
+      data: {
+        status: PaymentStatus.PAID
+      },
+    });
+
     //query-01 update appointment
     await tx.appointment.update({
-       where:{
-        id: appointmentId
-       },
-       data: {
-        paymentStatus: 'PAID'
-       }
-    })
+      where: {
+        id: updatedPayment.appointmentId,
+      },
+      data: {
+        paymentStatus: "PAID",
+      },
+    });
 
-    //query-02 update payment
-    const updatedPayment = await tx.payment.update({
-        where:{
-          appointmentId: appointmentId
-        },
-        data: {
-         status: 'PAID'
-        }
-     })
-
-     return updatedPayment;
-
-
+    return updatedPayment;
   })
+  
 
    
     return result;
