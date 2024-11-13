@@ -13,6 +13,11 @@ router.post(
   PaymentController.initPayment
 );
 
+router.get(
+  "/validate-payment",
+  PaymentController.validatePayment
+);
+
 router.post("/success/:appointmentId", PaymentController.paymentSuccess);
 
 export const PaymentRoutes = router;
