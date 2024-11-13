@@ -8,3 +8,8 @@ export const createAppointmentSchema = z.object({
         required_error:"scheduleId is required"
     })
 })
+
+
+export const changeAppointmentStatusSchema = z.object({
+    status: z.enum(['SCHEDULED', 'INPROGRESS', 'COMPLETED', 'CANCELED'])
+})

@@ -1,3 +1,4 @@
+import { AppointmentStatus } from "@prisma/client";
 
 export type TAppointment = {
     patientId: string;
@@ -17,3 +18,7 @@ export type TAppointmentQuery = {
     paymentStatus?: string;
 };
   
+
+export type TUpdateStatus = {
+    status: AppointmentStatus
+}

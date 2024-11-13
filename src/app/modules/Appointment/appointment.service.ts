@@ -1,7 +1,7 @@
 import ApiError from "../../errors/ApiError";
 import { calculatePaginationSorting, makeFilterQuery } from "../../helper/QueryBuilder";
 import prisma from "../../shared/prisma";
-import { TAppointment, TAppointmentQuery } from "./appointment.interface";
+import { TAppointment, TAppointmentQuery, TUpdateStatus } from "./appointment.interface";
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -290,8 +290,33 @@ const getAllAppointmentService = async (query: TAppointmentQuery) => {
 }
 
 
+const changeAppointmentStatusService = async (appointmentId:string, payload: TUpdateStatus) => {
+  const appointmentExist = await prisma.appointment.findUnique({
+    where: {
+      id:appointmentId
+    }
+  });
+
+  //check if appointment does not exist
+  if (!appointmentExist) {
+    throw new ApiError(404, "appointmentId does not exist");
+  }
+
+  const result = await prisma.appointment.update({
+    where: {
+      id: appointmentId
+    },
+    data: payload
+  })
+
+  return result
+
+}
+
+
 export {
     createAppointmentService,
     getMyAppointmentService,
-    getAllAppointmentService
+    getAllAppointmentService,
+    changeAppointmentStatusService
 }
