@@ -4,7 +4,7 @@ import catchAsync from "../../utils/catchAsync";
 import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
 import { AppointmentValidFields } from "./appointment.constant";
-import { changeAppointmentStatusService, createAppointmentService, getAllAppointmentService, getMyAppointmentService } from "./appointment.service";
+import { changeAppointmentStatusService, changePaymentStatusService, createAppointmentService, getAllAppointmentService, getMyAppointmentService } from "./appointment.service";
 
 
 
@@ -66,9 +66,22 @@ const changeAppointmentStatus = catchAsync(async (req: Request & { user?: IAuthU
 })
 
 
+const changePaymentStatus = catchAsync(async (req: Request & { user?: IAuthUser }, res) => {
+  const { id } = req.params;
+  const result = await changePaymentStatusService(id, req.body.status);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Appointment Payment Status updated successfully",
+    data: result
+  })
+})
+
+
 export const AppointmentController = {
     createAppointment,
     getMyAppointments,
     getAllAppointments,
-    changeAppointmentStatus
+    changeAppointmentStatus,
+    changePaymentStatus
 }

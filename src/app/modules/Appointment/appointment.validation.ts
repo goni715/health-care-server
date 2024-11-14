@@ -13,3 +13,8 @@ export const createAppointmentSchema = z.object({
 export const changeAppointmentStatusSchema = z.object({
     status: z.enum(['SCHEDULED', 'INPROGRESS', 'COMPLETED', 'CANCELED'])
 })
+
+
+export const changePaymentStatusSchema = z.object({
+    status: z.enum(['PAID', 'UNPAID'])
+})

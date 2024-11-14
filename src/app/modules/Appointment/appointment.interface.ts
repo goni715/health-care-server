@@ -1,4 +1,4 @@
-import { AppointmentStatus } from "@prisma/client";
+import { AppointmentStatus, PaymentStatus } from "@prisma/client";
 
 export type TAppointment = {
     patientId: string;

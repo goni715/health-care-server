@@ -1,3 +1,4 @@
+import { PaymentStatus } from "@prisma/client";
 import ApiError from "../../errors/ApiError";
 import { calculatePaginationSorting, makeFilterQuery } from "../../helper/QueryBuilder";
 import { IAuthUser } from "../../interfaces/common.interface";
@@ -301,7 +302,6 @@ const changeAppointmentStatusService = async (appointmentId:string, payload: TUp
     }
   });
 
-  console.log(appointmentExist);
 
   //check if appointment does not exist
   if (!appointmentExist) {
@@ -378,11 +378,55 @@ const cancelUnpaidAppointmentService = async ()=> {
 
 }
 
+const changePaymentStatusService = async (appointmentId:string, status: PaymentStatus) => {
+
+  const appointmentExist = await prisma.appointment.findUnique({
+    where: {
+      id:appointmentId
+    }
+  });
+
+
+  //check if appointment does not exist
+  if (!appointmentExist) {
+    throw new ApiError(404, "appointmentId does not exist");
+  }
+
+
+  const result = await prisma.$transaction( async (tx)=> {
+    const updatedAppointment = await prisma.appointment.update({
+      where: {
+        id: appointmentId
+      },
+      data: {
+        paymentStatus: status
+      }
+    });
+
+    await prisma.payment.update({
+      where: {
+        appointmentId: appointmentId
+      },
+      data: {
+        status
+      }
+    });
+
+    return updatedAppointment;
+
+  })
+
+
+  return result;
+
+}
+
 
 export {
     createAppointmentService,
     getMyAppointmentService,
     getAllAppointmentService,
     changeAppointmentStatusService,
-    cancelUnpaidAppointmentService
+    cancelUnpaidAppointmentService,
+    changePaymentStatusService
 }
