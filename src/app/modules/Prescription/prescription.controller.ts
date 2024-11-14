@@ -1,6 +1,8 @@
 import catchAsync from "../../utils/catchAsync";
+import pickValidFields from "../../utils/pickValidFields";
 import sendResponse from "../../utils/sendResponse";
-import { createPrescriptionService } from "./prescription.service";
+import { PrescriptionFields } from "./patient.constant";
+import { createPrescriptionService, getMyPrescriptionService } from "./prescription.service";
 
 const createPrescription = catchAsync(async (req, res) => {
   const { email } = req.headers;
@@ -15,7 +17,23 @@ const createPrescription = catchAsync(async (req, res) => {
 
 
 
+const getMyPrescription = catchAsync(async (req, res) => {
+  const { email, role } = req.headers;
+  const validatedQuery = pickValidFields(req.query, PrescriptionFields)
+  const result = await getMyPrescriptionService(email as string, role as string, validatedQuery);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Prescriptions are retrieved successfully",
+    meta: result.meta,
+    data: result.data
+  })
+})
+
+
+
 
 export const PrescriptionController = {
-    createPrescription
+    createPrescription,
+    getMyPrescription
 }

@@ -14,5 +14,10 @@ router.post(
   PrescriptionController.createPrescription
 );
 
+router.get(
+  "/get-my-prescription",
+  AuthMiddleware("doctor", "patient"),
+  PrescriptionController.getMyPrescription
+);
 
 export const PrescriptionRoutes = router;
