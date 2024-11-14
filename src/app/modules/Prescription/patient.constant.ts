@@ -7,11 +7,14 @@ export const PrescriptionSearchableFields = [
 ];
 
 export const PrescriptionFields: string[] = [
-    "searchTerm",
-    "page",
-    "limit",
-    "sortBy",
-    "sortOrder",
-    "email"
+  "searchTerm",
+  "page",
+  "limit",
+  "sortBy",
+  "sortOrder",
+  "name",
+  "email",
+  "contactNumber",
+  "address",
 ];
 

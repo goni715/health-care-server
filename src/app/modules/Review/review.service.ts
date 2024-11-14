@@ -1,6 +1,8 @@
 import { Review } from "@prisma/client";
 import ApiError from "../../errors/ApiError";
 import prisma from "../../shared/prisma";
+import { calculatePaginationSorting, makeFilterQuery, makeSearchQuery } from "../../helper/QueryBuilder";
+import { ReviewSearchableFields } from "./review.constant";
 
 
 
@@ -51,16 +53,16 @@ const createReviewService = async (email:string, payload:Review)=> {
         data: payload,
       });
 
-      //query-03 find doctorAllReviews
-      const doctorAllReviews = await tx.review.findMany({
-        where: {
-          doctorId: appointmentExist.doctorId,
+    
+      //query-02 find averageRating
+      const average = await tx.review.aggregate({
+        _avg: {
+          rating: true
         },
-      });
-
-      const totalRating = doctorAllReviews?.map((item) => item.rating)
-                                           .reduce((acc, cv) => acc + cv, 0);
-      const averageRating = totalRating / doctorAllReviews.length;
+        where: {
+          doctorId: appointmentExist.doctorId
+        }
+      })
 
 
       //query-03 update doctor
@@ -69,21 +71,86 @@ const createReviewService = async (email:string, payload:Review)=> {
             id: appointmentExist.doctorId
         },
         data: {
-            averageRating: averageRating
+            averageRating: average._avg.rating as number
         }
       })
 
 
-      return createdReview;
-
-
+      return createdReview
     });
 
 
-    return result
-  };
+    return result;
+};
 
+
+const getAllReviewsService = async (query: any) => {
+    const { searchTerm, page, limit, sortBy, sortOrder, ...filters } = query;
+  
+    let searchQuery;
+    if (searchTerm) {
+      searchQuery = [
+        {
+          patient: {
+            OR: makeSearchQuery(ReviewSearchableFields, searchTerm),
+          },
+        },
+        {
+          doctor: {
+            OR: makeSearchQuery(ReviewSearchableFields, searchTerm),
+          },
+        },
+      ];
+    }
+  
+
+  
+    // Build the 'where' clause based on search and filter
+    const whereConditions: any = {
+      OR: searchQuery,
+    };
+  
+    //console.dir(whereConditions, {depth: Infinity});
+  
+    // Calculate pagination values & sorting
+    const pagination = calculatePaginationSorting({
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    });
+  
+    const result = await prisma.review.findMany({
+      where: whereConditions,
+      skip: pagination.skip,
+      take: pagination.limit,
+      orderBy: {
+        [pagination.sortBy]: pagination.sortOrder,
+      },
+      include: {
+        doctor: true,
+        patient: true,
+      },
+    });
+  
+    // Count total with matching the criteria
+    const total = await prisma.review.count({
+      where: whereConditions,
+    });
+  
+    return {
+      meta: {
+        page: pagination.page,
+        limit: pagination.limit,
+        totalPages: Math.ceil(total / pagination.limit),
+        total,
+      },
+      data: result,
+    };
+};
+  
 
 export {
-    createReviewService
+    createReviewService,
+    getAllReviewsService
 }

@@ -1,7 +1,11 @@
-import { AppointmentStatus, PaymentStatus, Prescription } from "@prisma/client";
+import { Prescription } from "@prisma/client";
 import ApiError from "../../errors/ApiError";
 import prisma from "../../shared/prisma";
-import { calculatePaginationSorting, makeSearchQuery } from "../../helper/QueryBuilder";
+import {
+  calculatePaginationSorting,
+  makeFilterQuery,
+  makeSearchQuery,
+} from "../../helper/QueryBuilder";
 import { TPrescriptionQuery } from "./prescription.interface";
 import { PrescriptionSearchableFields } from "./patient.constant";
 
@@ -140,6 +144,9 @@ const getMyPrescriptionService = async (
     where: whereConditions,
     skip: pagination.skip,
     take: pagination.limit,
+    orderBy: {
+      [pagination.sortBy]: pagination.sortOrder,
+    },
     include: {
       doctor: true,
       patient: true,
@@ -162,4 +169,92 @@ const getMyPrescriptionService = async (
   };
 };
 
-export { createPrescriptionService, getMyPrescriptionService };
+const getAllPrescriptionService = async (query: TPrescriptionQuery) => {
+  const { searchTerm, page, limit, sortBy, sortOrder, ...filters } = query;
+
+  let filterQuery;
+  let searchQuery;
+  if (searchTerm) {
+    searchQuery = [
+      {
+        patient: {
+          OR: makeSearchQuery(PrescriptionSearchableFields, searchTerm),
+        },
+      },
+      {
+        doctor: {
+          OR: makeSearchQuery(PrescriptionSearchableFields, searchTerm),
+        },
+      },
+    ];
+  }
+
+  // Apply additional filters- filter-condition for specific field
+  if (Object.keys(filters).length > 0) {
+    const filterResult = makeFilterQuery(filters);
+    filterQuery = [
+      {
+        doctor: {
+          AND: filterResult,
+        },
+      },
+      {
+        patient: {
+          AND: filterResult,
+        },
+      },
+    ];
+  }
+
+  // Build the 'where' clause based on search and filter
+  const whereConditions: any = {
+    AND: {
+      OR: filterQuery,
+    },
+    OR: searchQuery,
+  };
+
+  //console.dir(whereConditions, {depth: Infinity});
+
+  // Calculate pagination values & sorting
+  const pagination = calculatePaginationSorting({
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+  });
+
+  const result = await prisma.prescription.findMany({
+    where: whereConditions,
+    skip: pagination.skip,
+    take: pagination.limit,
+    orderBy: {
+      [pagination.sortBy]: pagination.sortOrder,
+    },
+    include: {
+      doctor: true,
+      patient: true,
+    },
+  });
+
+  // Count total with matching the criteria
+  const total = await prisma.prescription.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: Math.ceil(total / pagination.limit),
+      total,
+    },
+    data: result,
+  };
+};
+
+export {
+  createPrescriptionService,
+  getMyPrescriptionService,
+  getAllPrescriptionService,
+};

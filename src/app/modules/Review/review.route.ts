@@ -16,6 +16,10 @@ router.post(
   ReviewController.createReview
 );
 
-
+router.get(
+  "/get-all-reviews",
+  AuthMiddleware("admin", "super_admin"),
+  ReviewController.getAllReviews
+);
 
 export const ReviewRoutes = router;

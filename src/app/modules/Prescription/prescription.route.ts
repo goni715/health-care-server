@@ -22,4 +22,11 @@ router.get(
   PrescriptionController.getMyPrescription
 );
 
+router.get(
+  "/get-all-prescriptions",
+  AuthMiddleware("admin", "super_admin"),
+  PrescriptionController.getAllPrescriptions
+);
+
+
 export const PrescriptionRoutes = router;
