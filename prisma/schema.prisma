@@ -58,6 +58,7 @@ model Doctor {
   currentWorkingPlace String
   designation String
   isDeleted Boolean @default(false)
+  averageRating Float @default(0.0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -274,7 +275,7 @@ model Review {
   appointment Appointment @relation(fields: [appointmentId], references: [id])
   rating Float
   comment String
-   createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   @@map("reviews")

@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-export const createPrescriptionSchema = z.object({
-    appointmentId: z.string({
-        required_error:"appointmentId is required"
-    }),
-    instructions: z.string({
-        required_error:"instructions required"
-    }),
-    followUpDate: z
-    .string()
-    .transform((val) => new Date(val)).optional(),
-})
+export const createReviewSchema = z.object({
+  appointmentId: z.string({
+    required_error: "appointmentId is required",
+  }),
+  rating: z.number({
+    required_error: "Rating is required",
+  }),
+  comment: z.string({
+    required_error: "Comment is required",
+  }),
+});

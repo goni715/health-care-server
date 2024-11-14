@@ -110,7 +110,7 @@ const createAppointmentService = async (
     return createdAppointmentData;
   });
 
-  return "result";
+  return result;
 };
 
 const getMyAppointmentService = async (
