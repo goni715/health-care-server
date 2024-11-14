@@ -8,7 +8,7 @@ const router = express.Router();
 
 
 router.post(
-  "/create-prescription/:appointmentId",
+  "/create-prescription",
   AuthMiddleware("doctor"),
   //validateRequest(createMedicalReportSchema),
   PrescriptionController.createPrescription
