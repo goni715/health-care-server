@@ -20,11 +20,12 @@ export default {
     cloud_api_key : process.env.CLOUD_API_KEY,
     cloud_api_secret: process.env.CLOUD_API_SECRET,
     super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
+    super_admin_email: process.env.SUPER_ADMIN_EMAIL,
     store_id: process.env.STORE_ID,
     store_passwd: process.env.STORE_PASSWD,
     ssl_payment_api: process.env.SSL_PAYMENT_API,
     ssl_validation_api: process.env.SSL_VALIDATION_API,
     success_url: process.env.SUCCESS_URL,
     cancel_url: process.env.CANCEL_URL,
-    fail_url: process.env.FAIL_URL
+    fail_url: process.env.FAIL_URL,
 }

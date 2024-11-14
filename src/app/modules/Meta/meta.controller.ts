@@ -10,7 +10,7 @@ const fetchDashboardMetaData = catchAsync(async (req: Request & {user?: IAuthUse
     sendResponse(res, {
       statusCode: 200,
       success: true,
-      message: "Reviews are retrieved successfully",
+      message: "Meta data retrieved successfully",
       data: result
     })
   
