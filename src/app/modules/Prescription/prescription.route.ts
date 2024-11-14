@@ -1,6 +1,8 @@
 import express from 'express';
 import AuthMiddleware from '../../middlewares/AuthMiddleware';
 import { PrescriptionController } from './prescription.controller';
+import { createPrescriptionSchema } from './prescription.validation';
+import validateRequest from '../../middlewares/validateRequest';
 
 
 const router = express.Router();
@@ -10,7 +12,7 @@ const router = express.Router();
 router.post(
   "/create-prescription",
   AuthMiddleware("doctor"),
-  //validateRequest(createMedicalReportSchema),
+  validateRequest(createPrescriptionSchema),
   PrescriptionController.createPrescription
 );
 
