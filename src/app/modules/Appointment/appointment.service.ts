@@ -343,7 +343,38 @@ const cancelUnpaidAppointmentService = async ()=> {
   })
 
   const unpaidAppointmentIds = unpaidAppointments?.map((item)=>item.id);
-  console.log(unpaidAppointmentIds);
+
+  if(unpaidAppointmentIds.length === 0){
+    //console.log('There is no unpaidAppointmentIds');
+    return true;
+  }
+  
+  await prisma.$transaction(async(tx)=> {
+    //query-01 delete payment
+    await tx.payment.deleteMany({
+      where: {
+        appointmentId: {in: unpaidAppointmentIds}
+      }
+    })
+
+
+     //query-02 delete DoctorSchedule
+     await tx.doctorSchedules.updateMany({
+      where: {
+        appointmentId: {in: unpaidAppointmentIds}
+      },
+      data: {
+        isBooked: false
+      }
+     })
+
+     //query-03 delete appointment
+     await tx.appointment.deleteMany({
+      where: {
+        id: {in: unpaidAppointmentIds}
+      }
+     })
+  })
 
 }
 
