@@ -14,7 +14,9 @@ const AuthMiddleware = (...roles: TUserRole[]) => {
         return res.status(401).json({
           success: false,
           message: "You are not authorized",
-          error: "jwt token must be provided",
+          error: {
+            message: "jwt token must be provided"
+          }
         });
       }
 
@@ -30,7 +32,9 @@ const AuthMiddleware = (...roles: TUserRole[]) => {
         return res.status(401).json({
              success: false,
              message: "You are not authorized",
-             error: `User role is ${decoded.role}`
+             error: {
+               message: `Please, provide ${roles.join(' or ')} token`
+             }
         });
       }
 
@@ -45,7 +49,9 @@ const AuthMiddleware = (...roles: TUserRole[]) => {
         return res.status(401).json({
              success: false,
              message: "You are not authorized",
-             error: "This user is not existed"
+             error: {
+               message: "This user is not existed"
+             }
         });
       }
 
@@ -54,7 +60,9 @@ const AuthMiddleware = (...roles: TUserRole[]) => {
         return res.status(401).json({
              success: false,
              message: "You are not authorized",
-             error: 'This user is deleted'
+             error: {
+               message: 'This user is deleted'
+             }
          });
       }
 
@@ -64,7 +72,9 @@ const AuthMiddleware = (...roles: TUserRole[]) => {
         return res.status(401).json({
             success: false,
             message: "You are not authorized",
-            error: 'This user is blocked'
+            error: {
+              message: 'This user is blocked'
+            }
         });
       }
 
@@ -81,7 +91,9 @@ const AuthMiddleware = (...roles: TUserRole[]) => {
       res.status(401).json({
         success: false,
         message: "You are not authorized",
-        error: err.message,
+        error: {
+          message: err.message
+        }
       });
     }
   };
