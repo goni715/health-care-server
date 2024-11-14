@@ -111,6 +111,8 @@ const getSingleDoctorService = async (id: string) => {
   return result;
 };
 
+
+
 const deleteDoctorService = async (id: string): Promise<Doctor> => {
 
   const doctor = await prisma.doctor.findUnique({
@@ -125,15 +127,43 @@ const deleteDoctorService = async (id: string): Promise<Doctor> => {
     throw new ApiError(404, "id does not exist");
   }
 
+
+  const appointmentExist = await prisma.appointment.findMany({
+    where: {
+      doctorId:id
+    },
+  });
+
+  //check if appointmentExist
+  if(appointmentExist.length > 0){
+    throw new ApiError(409, 'This doctorId is associated with Appointment');
+  }
+ 
+
+
   const result = await prisma.$transaction(async (transactionClient) => {
-    //query-01 doctor delete
+    //query-01 delete doctorSpecialties
+    await transactionClient.doctorSpecialties.deleteMany({
+      where: {
+        doctorId: id,
+      },
+    });
+
+    //query-02 delete doctorSchedules
+    await transactionClient.doctorSchedules.deleteMany({
+      where: {
+        doctorId: id,
+      },
+    });
+
+    //query-03 doctor delete
     const doctorDeletedData = await transactionClient.doctor.delete({
       where: {
         id,
       },
     });
 
-    //query-02 delete-user
+    //query-04 delete-user
     await transactionClient.user.delete({
       where: {
         email: doctorDeletedData.email,
