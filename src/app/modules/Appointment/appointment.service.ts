@@ -331,8 +331,8 @@ const changeAppointmentStatusService = async (appointmentId:string, payload: TUp
 }
 
 const cancelUnpaidAppointmentService = async ()=> {
-  console.log('cancel');
-  const thirtyMinutesAgo = new Date(Date.now()- 2*60*1000); //2 minutes ago
+  //console.log('cancel');
+  const thirtyMinutesAgo = new Date(Date.now()- 30*60*1000); //30 minutes ago
   const unpaidAppointments = await prisma.appointment.findMany({
     where: {
       createdAt: {
