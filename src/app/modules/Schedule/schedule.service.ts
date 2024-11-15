@@ -8,6 +8,13 @@ import prisma from "../../shared/prisma";
 import { calculatePaginationSorting } from "../../helper/QueryBuilder";
 import ApiError from "../../errors/ApiError";
 
+
+const convertDateToUTCTime = async (date: Date) => {
+  const offset = date.getTimezoneOffset() * 60000 //getTimezone * 1 hour
+  return new Date(date.getTime() + offset);
+
+}
+
 const createScheduleService = async (payload: TSchedule) => {
   const { startDate, endDate, startTime, endTime } = payload;
   const intervalTime = 30; //30 minutes
@@ -42,9 +49,16 @@ const createScheduleService = async (payload: TSchedule) => {
     // Create slots for the current day
     //create schedule slot after 30 minutes interval
     while (currentDateStartDateTime < currentDateEndDateTime) {
+      // const scheduleData = {
+      //   startDateTime: currentDateStartDateTime,
+      //   endDateTime: addMinutes(currentDateStartDateTime, intervalTime),
+      // };
+
+      
+      //converted utc time
       const scheduleData = {
-        startDateTime: currentDateStartDateTime,
-        endDateTime: addMinutes(currentDateStartDateTime, intervalTime),
+        startDateTime: await convertDateToUTCTime(currentDateStartDateTime),
+        endDateTime: await convertDateToUTCTime(addMinutes(currentDateStartDateTime, intervalTime)),
       };
 
 
