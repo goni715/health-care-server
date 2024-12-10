@@ -5,7 +5,6 @@ export const DoctorSearchableFields = [
   "contactNumber",
   "address",
   "registrationNumber",
-  "gender",
   "qualification",
   "currentWorkingPlace",
   "designation"
