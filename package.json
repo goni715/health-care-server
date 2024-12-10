@@ -6,7 +6,8 @@
   "scripts": {
     "start": "ts-node-dev --respawn --transpile-only ./src/server.ts",
     "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
-    "seed": "ts-node-dev --respawn --transpile-only prisma/seed.ts"
+	"build": "tsc --watch",
+    "seed": "ts-node-dev --respawn --transpile-only src/app/seed/seed.ts"
   },
   "keywords": [],
   "author": "",

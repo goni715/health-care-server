@@ -24,7 +24,7 @@ router.post(
 );
 
 
-router.get('/get-all-specialties', AuthMiddleware(UserRole.admin, UserRole.super_admin, UserRole.doctor), SpecialtiesController.getAllSpecialties);
+router.get('/get-all-specialties', SpecialtiesController.getAllSpecialties);
 router.delete('/delete-specialties/:id', AuthMiddleware('admin', 'super_admin', 'doctor', 'patient'), SpecialtiesController.deleteSpecialties)
 router.patch(
   '/update-icon/:id',

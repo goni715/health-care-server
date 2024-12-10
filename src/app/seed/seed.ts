@@ -1,7 +1,8 @@
-import { UserRole } from "@prisma/client";
-import prisma from "../src/app/shared/prisma";
-import hashedPassword from "../src/app/utils/hashedPassword";
-import config from "../src/app/config";
+import { PrismaClient, UserRole } from "@prisma/client";
+import hashedPassword from "../utils/hashedPassword";
+import config from "../config";
+
+const prisma = new PrismaClient();
 
 const seedSuperAdmin = async () => {
     try {
