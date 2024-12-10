@@ -134,13 +134,13 @@ const doctorSchedules = await prisma.doctorSchedules.findMany({
   }
 })
 
- const doctorScheduleIds = doctorSchedules.map((item)=> item.scheduleId);
+const doctorScheduleIds  = new Set(doctorSchedules.map((item)=> item.scheduleId));
 
   const result = await prisma.schedule.findMany({
     where: {
       AND: filterQuery,
       id:{
-        notIn: doctorScheduleIds
+        notIn: [...doctorScheduleIds]
       }
     },
     skip: pagination.skip,
@@ -158,7 +158,7 @@ const doctorSchedules = await prisma.doctorSchedules.findMany({
     where: {
       AND: filterQuery,
       id:{
-        notIn: doctorScheduleIds
+        notIn: [...doctorScheduleIds]
       }
     }
   });
