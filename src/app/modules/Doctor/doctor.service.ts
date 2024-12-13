@@ -102,6 +102,13 @@ const getSingleDoctorService = async (id: string) => {
       id,
       isDeleted: false,
     },
+	include: {
+      doctorSpecialties: {
+        include: {
+          specialties: true
+        }
+      }
+    }
   });
 
   if(!result){

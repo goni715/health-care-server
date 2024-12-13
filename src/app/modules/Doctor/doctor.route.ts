@@ -12,12 +12,10 @@ const router = express.Router();
 
 router.get(
   "/get-all-doctors",
-  AuthMiddleware("admin", "super_admin"),
   DoctorController.getAllDoctors
 );
 router.get(
   "/get-single-doctor/:id",
-  AuthMiddleware("admin", "super_admin"),
   DoctorController.getSingleDoctor
 );
 router.delete(
